@@ -1,14 +1,27 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Antonio Gat Fernández",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#04397f",
+    "light": "#6a8cb8",
+    "dark": "#04397f"
   },
-  "favicon": "/favicon.svg",
   "navigation": {
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Documentation",
+          "icon": "book-open-cover",
+          "href": "https://mintlify.com/docs"
+        },
+        {
+          "anchor": "Blog",
+          "icon": "newspaper",
+          "href": "https://mintlify.com/blog"
+        }
+      ]
+    },
     "tabs": [
       {
         "tab": "Guides",
@@ -66,22 +79,12 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Intranet FedexVB",
+        "href": "https://arbitros.fedexvoleibol.com/"
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
@@ -90,8 +93,8 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Soporte",
+        "href": "mailto:hola@antoniogatfdez.com"
       }
     ],
     "primary": {
@@ -114,9 +117,35 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/antoniogatfdez",
+      "github": "https://github.com/antoniogatfdez",
+      "linkedin": "https://linkedin.com/antoniogatfdez",
+      "instagram": "https://www.instagram.com/antoniogatfdez/",
+      "website": "https://antoniogatfdez.com/"
+    }
+  },
+  "fonts": {
+    "family": "Roboto"
+  },
+  "banner": {
+    "dismissible": false,
+    "content": "Estás enviando un correo a hola@antoniogatfdez.com"
+  },
+  "errors": {
+    "404": {
+      "title": "Página No Encontrada",
+      "description": "La página que buscas no existe. Si crees que ha sido un error contacta conmigo: hola@antoniogatfdez.com"
+    }
+  },
+  "interaction": {
+    "drilldown": true
+  },
+  "metadata": {
+    "timestamp": true
+  },
+  "integrations": {
+    "gtm": {
+      "tagId": "GTM-55MD7QHX"
     }
   }
 }
