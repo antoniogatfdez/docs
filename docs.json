@@ -24,7 +24,15 @@
     },
     "tabs": [
       {
-        "tab": "Instrucciones"
+        "tab": "Instrucciones",
+        "groups": [
+          {
+            "group": "IP Elásticas",
+            "pages": [
+              "readme"
+            ]
+          }
+        ]
       },
       {
         "tab": "API reference",
