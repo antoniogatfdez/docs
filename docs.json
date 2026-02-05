@@ -71,7 +71,14 @@
                   },
                   {
                     "group": "Diseño",
-                    "pages": []
+                    "pages": [
+                      {
+                        "group": "Guia de Estilos",
+                        "pages": [
+                          "guia"
+                        ]
+                      }
+                    ]
                   },
                   {
                     "group": "Manual de Instalación",
