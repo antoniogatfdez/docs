@@ -177,5 +177,6 @@
   },
   "seo": {
     "indexing": "all"
-  }
+  },
+  "favicon": "/images/logo.ico"
 }
