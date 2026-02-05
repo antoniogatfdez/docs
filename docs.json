@@ -82,15 +82,23 @@
                   },
                   {
                     "group": "Manual de Instalación",
-                    "pages": []
+                    "pages": [
+                      "manual"
+                    ]
                   },
                   {
                     "group": "Manual de Programación",
-                    "pages": []
+                    "pages": [
+                      "doc-apis",
+                      "doc-pruebas",
+                      "manual-1"
+                    ]
                   },
                   {
                     "group": "Manual de Usuario",
-                    "pages": []
+                    "pages": [
+                      "manual-2"
+                    ]
                   }
                 ]
               }

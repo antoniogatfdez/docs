@@ -1,0 +1,712 @@
+---
+title: 'Manual'
+---
+
+## Tabla de contenido
+
+- [Sprint-3 — Manual del Programador](#sprint-3--manual-del-programador)
+  - [Tabla de contenido](#tabla-de-contenido)
+  - [Arquitectura y tecnologías](#arquitectura-y-tecnologías)
+  - [Estructura de carpetas](#estructura-de-carpetas)
+  - [Componentes del sistema](#componentes-del-sistema)
+  - [Enrutamiento y flujo de ejecución](#enrutamiento-y-flujo-de-ejecución)
+  - [Modelos y acceso a datos (PDO)](#modelos-y-acceso-a-datos-pdo)
+  - [Controladores y validación](#controladores-y-validación)
+  - [Vistas, CSS y JS](#vistas-css-y-js)
+  - [Módulos JavaScript](#módulos-javascript)
+  - [Autenticación, sesiones y roles](#autenticación-sesiones-y-roles)
+  - [API Endpoints (AJAX)](#api-endpoints-ajax)
+  - [Accesibilidad y usabilidad](#accesibilidad-y-usabilidad)
+  - [Estándares y buenas prácticas](#estándares-y-buenas-prácticas)
+  - [Cómo añadir nuevas funcionalidades](#cómo-añadir-nuevas-funcionalidades)
+  - [Pruebas automatizadas](#pruebas-automatizadas)
+  - [Depuración y registro de errores](#depuración-y-registro-de-errores)
+  - [Despliegue y configuración](#despliegue-y-configuración)
+  - [Documentación adicional](#documentación-adicional)
+
+---
+
+## Arquitectura y tecnologías
+
+| Componente | Tecnología |
+|------------|------------|
+| **Patrón** | MVC (Modelo–Vista–Controlador) |
+| **Lenguaje** | PHP 8+ |
+| **Base de datos** | MySQL 8 (UTF8MB4) |
+| **Conexión** | PDO con `ATTR_ERRMODE = EXCEPTION`, `ATTR_EMULATE_PREPARES = false` |
+| **Sesiones** | Nativas de PHP (control en `config.php`) |
+| **Front-end** | HTML5 + CSS3 + JavaScript ES6 |
+| **Iconos** | Font Awesome 6 |
+| **Accesibilidad** | WCAG 2.1 Nivel AA/AAA |
+
+---
+
+## Estructura de carpetas
+
+```
+src/
+  ├── sql/                       # Scripts SQL
+  │   ├── bbdd.sql               # Estructura de la base de datos
+  │   └── datos.sql              # Datos de prueba iniciales
+  ├── tests/                     # Pruebas automatizadas (PHPUnit)
+  │   ├── unit/                  # Pruebas unitarias
+  │   ├── functional/            # Pruebas funcionales
+  │   ├── integration/           # Pruebas de integración
+  │   └── user/                  # Casos de prueba UAT
+  └── www/                       # Aplicación web
+      ├── .htaccess              # Configuración Apache
+      ├── config.php             # Configuración global
+      ├── index.php              # Front Controller (router)
+      ├── controladores/         # Controladores MVC (9 archivos)
+      ├── modelos/               # Modelos de datos (8 archivos)
+      ├── vistas/                # Vistas PHP
+      ├── css/                   # Hojas de estilo
+      └── js/                    # Scripts JavaScript (11 archivos)
+```
+
+---
+
+## Componentes del sistema
+
+### Modelos (8 clases)
+
+| Modelo | Archivo | Descripción |
+|--------|---------|-------------|
+| `ModeloBase` | `modelo_base.php` | Clase base con conexión PDO |
+| `ModeloUsuario` | `modelo_usuario.php` | CRUD de usuarios, autenticación |
+| `ModeloArbitro` | `modelo_arbitro.php` | Gestión de árbitros y estadísticas |
+| `ModeloPartido` | `modelo_partido.php` | CRUD de partidos, asignaciones |
+| `ModeloCategoria` | `modelo_categoria.php` | Categorías de competición y tarifas |
+| `ModeloDisponibilidad` | `modelo_disponibilidad.php` | Disponibilidad de árbitros |
+| `ModeloLicencia` | `modelo_licencia.php` | Historial de licencias |
+| `ModeloLiquidacion` | `modelo_liquidacion.php` | Liquidaciones y rectificaciones |
+
+### Controladores (9 clases)
+
+| Controlador | Archivo | Descripción |
+|-------------|---------|-------------|
+| `ControladorAutenticacion` | `controlador_autenticacion.php` | Login, logout, cambio de contraseña |
+| `ControladorUsuario` | `controlador_usuario.php` | CRUD de usuarios (admin) |
+| `ControladorArbitro` | `controlador_arbitro.php` | Gestión de árbitros |
+| `ControladorPartido` | `controlador_partido.php` | CRUD de partidos |
+| `ControladorDisponibilidad` | `controlador_disponibilidad.php` | Disponibilidad (árbitro) |
+| `ControladorDisponibilidadAdmin` | `controlador_disponibilidad_admin.php` | Consulta disponibilidad (admin) |
+| `ControladorPerfil` | `controlador_perfil.php` | Perfil de usuario |
+| `ControladorLicencia` | `controlador_licencia.php` | CRUD de licencias (admin) |
+| `ControladorLiquidacion` | `controlador_liquidacion.php` | Gestión de liquidaciones |
+
+---
+
+## Enrutamiento y flujo de ejecución
+
+El enrutamiento se gestiona mediante el Front Controller `index.php`:
+
+```php
+$ruta = $_GET['ruta'] ?? 'login';
+$accion = $_POST['accion'] ?? ($_GET['accion'] ?? null);
+
+// Verificar cambio de contraseña obligatorio
+if (ControladorAutenticacion::autenticado() && 
+    ($_SESSION['password_temporal'] ?? false) && 
+    $ruta !== 'cambiar_password' && $ruta !== 'logout') {
+    header('Location: index.php?ruta=cambiar_password');
+    exit;
+}
+
+switch ($ruta) {
+    case 'login':        // Autenticación
+    case 'logout':       // Cierre de sesión
+    case 'cambiar_password':  // Cambio de contraseña
+    case 'dashboard':    // Panel principal (según rol)
+    case 'perfil':       // Perfil de usuario
+    case 'partidos':     // CRUD partidos (admin)
+    case 'mis_partidos': // Partidos del árbitro
+    case 'usuarios':     // CRUD usuarios (admin)
+    case 'arbitros':     // Gestión árbitros (admin)
+    case 'lista_arbitros': // Listado compañeros (árbitro)
+    case 'licencias':    // CRUD licencias (admin)
+    case 'liquidaciones': // Gestión liquidaciones (admin)
+    case 'mis_liquidaciones': // Liquidaciones (árbitro)
+    case 'disponibilidad_arbitros': // Consulta disponibilidad (admin)
+    case 'disponibilidad': // Registrar disponibilidad (árbitro)
+    case 'api':          // Endpoints AJAX
+    case 'unauthorized': // Acceso denegado
+    default:             // 404
+}
+```
+
+### Convenciones de enrutamiento
+
+- `ruta`: define el recurso principal (ej. `partidos`, `usuarios`)
+- `accion`: especifica la operación CRUD (ej. `crear`, `actualizar`, `eliminar`)
+- Control de acceso por rol antes de ejecutar acciones sensibles
+- Patrón PRG (Post/Redirect/Get) para evitar reenvíos de formularios
+
+### Tabla de rutas por rol
+
+| Ruta | Admin | Árbitro | Descripción |
+|------|-------|---------|-------------|
+| `login` | ✓ | ✓ | Inicio de sesión |
+| `dashboard` | ✓ | ✓ | Panel principal |
+| `perfil` | ✓ | ✓ | Perfil de usuario |
+| `cambiar_password` | ✓ | ✓ | Cambio de contraseña |
+| `partidos` | ✓ | ✗ | CRUD de partidos |
+| `mis_partidos` | ✗ | ✓ | Mis partidos asignados |
+| `usuarios` | ✓ | ✗ | Gestión de usuarios |
+| `arbitros` | ✓ | ✗ | Gestión de árbitros |
+| `lista_arbitros` | ✓ | ✓ | Lista de compañeros |
+| `licencias` | ✓ | ✗ | Gestión de licencias |
+| `liquidaciones` | ✓ | ✗ | Gestión de liquidaciones |
+| `mis_liquidaciones` | ✗ | ✓ | Mis liquidaciones |
+| `disponibilidad_arbitros` | ✓ | ✗ | Consultar disponibilidad |
+| `disponibilidad` | ✗ | ✓ | Registrar disponibilidad |
+
+---
+
+## Modelos y acceso a datos (PDO)
+
+### ModeloBase - Conexión centralizada
+
+```php
+class ModeloBase {
+    protected PDO $conexion;
+
+    public function __construct() {
+        $this->conexion = $this->crearConexion();
+    }
+
+    protected function crearConexion(): PDO {
+        $dsn = 'mysql:host=' . BD_HOST . ';dbname=' . BD_NOMBRE . ';charset=utf8mb4';
+        return new PDO($dsn, BD_USUARIO, BD_PASSWORD, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]);
+    }
+}
+```
+
+### Buenas prácticas aplicadas
+
+- ✅ Consultas preparadas para evitar inyección SQL
+- ✅ `FETCH_ASSOC` por defecto para arrays asociativos
+- ✅ `utf8mb4` para compatibilidad con emojis y caracteres especiales
+- ✅ Transacciones en operaciones múltiples (licencias, liquidaciones)
+- ✅ Eliminación lógica (`activo = 0`) en lugar de física
+
+### Tablas de la base de datos
+
+| Tabla | Descripción |
+|-------|-------------|
+| `usuarios` | Credenciales y tipo de usuario |
+| `arbitros` | Datos personales de árbitros |
+| `categorias` | Categorías de competición con tarifas |
+| `partidos` | Información de partidos |
+| `disponibilidad_arbitros` | Disponibilidad por fecha |
+| `licencias_arbitros` | Historial de licencias |
+| `liquidaciones` | Cabecera de liquidaciones |
+| `liquidaciones_partidos` | Detalle de partidos por liquidación |
+| `rectificaciones_liquidaciones` | Solicitudes de rectificación |
+
+---
+
+## Controladores y validación
+
+### Ejemplo: ControladorPartido
+
+```php
+class ControladorPartido {
+    private ModeloPartido $modeloPartido;
+
+    public function __construct() {
+        $this->modeloPartido = new ModeloPartido();
+        if (!ControladorAutenticacion::autenticado()) {
+            header('Location: index.php');
+            exit;
+        }
+    }
+
+    public function crear(): void {
+        $datos = $this->sanearDatos($_POST);
+        if ($this->validarDatos($datos)) {
+            $this->modeloPartido->crear($datos);
+            $_SESSION['flash'] = ['mensaje' => 'Partido creado correctamente.', 'exito' => true];
+        } else {
+            $_SESSION['flash'] = ['mensaje' => 'Datos inválidos.', 'exito' => false];
+        }
+        header('Location: index.php?ruta=partidos');
+        exit;
+    }
+
+    private function sanearDatos(array $d): array {
+        $limpios = [];
+        foreach ($d as $k => $v) {
+            $limpios[$k] = is_string($v) ? trim(htmlspecialchars($v, ENT_QUOTES, 'UTF-8')) : $v;
+        }
+        // Unificar fecha + hora
+        if (isset($d['fecha_dia'], $d['fecha_hora'])) {
+            $limpios['fecha'] = $d['fecha_dia'] . ' ' . $d['fecha_hora'] . ':00';
+        }
+        return $limpios;
+    }
+
+    private function validarDatos(array $datos): bool {
+        $requeridos = ['equipo_local', 'equipo_visitante', 'categoria_id', 'fecha', 'pabellon_nombre'];
+        foreach ($requeridos as $campo) {
+            if (empty($datos[$campo])) return false;
+        }
+        return strcasecmp($datos['equipo_local'], $datos['equipo_visitante']) !== 0;
+    }
+}
+```
+
+### Despacho de acciones con match
+
+```php
+match ($accion) {
+    'crear' => $controlador->crear(),
+    'actualizar' => $controlador->actualizar(),
+    'eliminar' => $controlador->eliminar(),
+    'editar' => $controlador->editar(),
+    'form' => $controlador->formularioCrear(),
+    'obtener' => $controlador->obtenerPartido(),
+    default => $controlador->listado()
+};
+```
+
+---
+
+## Vistas, CSS y JS
+
+### Estructura de vistas
+
+- Las vistas residen en `src/www/vistas/`
+- Contienen solo lógica de presentación
+- Reciben variables del controlador vía `extract($datos)`
+
+### Archivos CSS principales
+
+| Archivo | Descripción |
+|---------|-------------|
+| `estilos.css` | Estilos globales de la aplicación |
+| `responsive.css` | Reglas responsive y breakpoints |
+| `accesibilidad.css` | Estilos WCAG AAA |
+| `modales.css` | Estilos de ventanas modales |
+
+### Convenciones
+
+- ❌ No incluir estilos/scripts en línea
+- ✅ Ubicar CSS en `src/www/css/`
+- ✅ Ubicar JS en `src/www/js/`
+- ✅ Usar variables CSS para colores y espaciados
+- ✅ Diseño Mobile-First
+
+---
+
+## Módulos JavaScript
+
+### Archivos JavaScript (11 módulos)
+
+| Archivo | Descripción |
+|---------|-------------|
+| `app.js` | Módulo principal, sidebar responsive, tablas |
+| `usuarios.js` | Modales CRUD de usuarios |
+| `partidos.js` | Modales CRUD de partidos |
+| `arbitros.js` | Búsqueda y consulta de árbitros |
+| `disponibilidad.js` | Modal de disponibilidad |
+| `liquidaciones.js` | Búsqueda de partidos para liquidaciones |
+| `licencias.js` | Edición de licencias |
+| `modales.js` | Funciones genéricas de modales |
+| `cambiar_password.js` | Validación de contraseñas |
+| `wcag-aaa.js` | Panel de accesibilidad WCAG |
+| `nielsen.js` | Usabilidad (toasts, loading, confirmación) |
+
+### Ejemplo: Sistema de Modales
+
+```javascript
+/**
+ * Abre un modal por su ID
+ * @param {string} id - ID del modal a abrir
+ */
+function abrirModal(id) {
+    document.getElementById(id).classList.add('activo');
+}
+
+/**
+ * Cierra un modal por su ID
+ * @param {string} id - ID del modal a cerrar
+ */
+function cerrarModal(id) {
+    document.getElementById(id).classList.remove('activo');
+}
+
+// Cerrar modales con Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal.activo').forEach(function(modal) {
+            modal.classList.remove('activo');
+        });
+    }
+});
+```
+
+---
+
+## Autenticación, sesiones y roles
+
+### Inicio de sesión
+
+```php
+public function iniciarSesion(): void {
+    $usuario = trim($_POST['usuario'] ?? '');
+    $password = $_POST['password'] ?? '';
+    
+    $registro = $this->modeloUsuario->obtenerPorUsuario($usuario);
+    if ($registro && password_verify($password, $registro['password'])) {
+        $_SESSION['usuario_id'] = $registro['id'];
+        $_SESSION['usuario_nombre'] = $registro['usuario'];
+        $_SESSION['tipo_usuario'] = $registro['tipo_usuario'];
+        $_SESSION['password_temporal'] = (bool)($registro['password_temporal'] ?? false);
+        
+        if ($_SESSION['password_temporal']) {
+            header('Location: index.php?ruta=cambiar_password');
+        } else {
+            header('Location: index.php?ruta=dashboard');
+        }
+        exit;
+    }
+    $this->redirigirConMensaje('Usuario o contraseña incorrectos.', false);
+}
+```
+
+### Variables de sesión
+
+| Variable | Tipo | Descripción |
+|----------|------|-------------|
+| `usuario_id` | int | ID del usuario autenticado |
+| `usuario_nombre` | string | Nombre de usuario |
+| `tipo_usuario` | string | `administrador` o `arbitro` |
+| `password_temporal` | bool | Si debe cambiar contraseña |
+| `flash` | array | Mensajes flash (mensaje, exito/tipo) |
+
+### Protección de rutas
+
+```php
+// En index.php, antes de cada ruta sensible
+if (($_SESSION['tipo_usuario'] ?? '') !== 'administrador') {
+    header('Location: index.php');
+    exit;
+}
+```
+
+---
+
+## API Endpoints (AJAX)
+
+El sistema incluye endpoints JSON para operaciones AJAX:
+
+```php
+case 'api':
+    header('Content-Type: application/json; charset=utf-8');
+    $recurso = $_GET['recurso'] ?? '';
+    
+    switch ($recurso) {
+        case 'disponibilidad_fecha':
+            // Obtener árbitros disponibles por fecha
+            $modelo = new ModeloDisponibilidad();
+            $disponibles = $modelo->obtenerDisponiblesPorFecha($fecha);
+            echo json_encode(['success' => true, 'data' => $disponibles]);
+            break;
+            
+        case 'estadisticas_arbitro':
+            // Estadísticas de un árbitro
+            $modelo = new ModeloArbitro();
+            $stats = $modelo->obtenerEstadisticas($arbitroId);
+            echo json_encode(['success' => true, 'data' => $stats]);
+            break;
+    }
+    exit;
+```
+
+### Endpoints disponibles
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `?ruta=api&recurso=disponibilidad_fecha&fecha=YYYY-MM-DD` | GET | Árbitros disponibles |
+| `?ruta=api&recurso=estadisticas_arbitro&arbitro_id=N` | GET | Estadísticas de árbitro |
+| `?ruta=partidos&accion=obtener&id=N` | GET | Datos de un partido (JSON) |
+| `?ruta=usuarios&accion=obtener_arbitro&id=N` | GET | Datos de árbitro asociado |
+
+---
+
+## Accesibilidad y usabilidad
+
+### WCAG 2.1 Nivel AA/AAA
+
+El módulo `wcag-aaa.js` proporciona:
+
+- Panel de configuración de accesibilidad
+- Texto más grande
+- Mayor espaciado de texto
+- Reducción de animaciones
+- Resaltado de enlaces
+- Cursor grande
+- Modo lectura fácil
+- Navegación por teclado mejorada
+- Anuncios para lectores de pantalla
+
+### Principios de Nielsen
+
+El módulo `nielsen.js` implementa:
+
+- **ToastManager**: Notificaciones tipo toast
+- **LoadingManager**: Indicadores de carga
+- **ConfirmManager**: Diálogos de confirmación
+
+---
+
+## Estándares y buenas prácticas
+
+### Nomenclatura
+
+- Clases en `PascalCase`: `ModeloUsuario`, `ControladorPartido`
+- Métodos en `camelCase`: `obtenerPorId()`, `listarTodos()`
+- Variables en `camelCase`: `$usuarioId`, `$fechaInicio`
+- Constantes en `SCREAMING_SNAKE_CASE`: `BD_HOST`, `APP_DEPURACION`
+- Archivos en `snake_case`: `modelo_usuario.php`, `controlador_partido.php`
+
+### Clean Code
+
+- ✅ Funciones cortas con responsabilidad única
+- ✅ Nombres descriptivos y autoexplicativos
+- ✅ Comentarios PHPDoc/JSDoc en clases y métodos
+- ✅ Manejo de errores centralizado
+- ✅ Evitar duplicación de lógica
+
+### Reglas rápidas
+
+1. Siempre usar consultas preparadas para datos externos
+2. Validar entrada en controladores, revalidar en modelos si aplica
+3. No acceder a `$_POST`/`$_GET` directamente en vistas
+4. Usar mensajes flash para feedback al usuario
+5. Aplicar patrón PRG (Post/Redirect/Get)
+6. Documentar código con PHPDoc y JSDoc
+
+---
+
+## Cómo añadir nuevas funcionalidades
+
+### 1. Base de datos
+
+```sql
+-- Añadir en src/sql/bbdd.sql
+CREATE TABLE nueva_entidad (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    activo TINYINT(1) DEFAULT 1,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+### 2. Modelo
+
+```php
+// src/www/modelos/modelo_nueva_entidad.php
+<?php
+require_once __DIR__ . '/modelo_base.php';
+
+/**
+ * ModeloNuevaEntidad: operaciones CRUD.
+ * @package Modelos
+ */
+class ModeloNuevaEntidad extends ModeloBase {
+    public function listarTodos(): array {
+        return $this->conexion->query('SELECT * FROM nueva_entidad WHERE activo = 1')->fetchAll();
+    }
+
+    public function crear(array $datos): int {
+        $stmt = $this->conexion->prepare('INSERT INTO nueva_entidad (nombre) VALUES (:nombre)');
+        $stmt->execute([':nombre' => $datos['nombre']]);
+        return (int)$this->conexion->lastInsertId();
+    }
+}
+```
+
+### 3. Controlador
+
+```php
+// src/www/controladores/controlador_nueva_entidad.php
+<?php
+require_once __DIR__ . '/../modelos/modelo_nueva_entidad.php';
+
+/**
+ * ControladorNuevaEntidad: orquestación CRUD.
+ * @package Controladores
+ */
+class ControladorNuevaEntidad {
+    private ModeloNuevaEntidad $modelo;
+
+    public function __construct() {
+        $this->modelo = new ModeloNuevaEntidad();
+    }
+
+    public function listado(): void {
+        $items = $this->modelo->listarTodos();
+        $flash = $_SESSION['flash'] ?? null;
+        unset($_SESSION['flash']);
+        require __DIR__ . '/../vistas/nueva_entidad_listado.php';
+    }
+
+    public function crear(): void {
+        // Validar, insertar, flash, redirect
+    }
+}
+```
+
+### 4. Vista
+
+```php
+<!-- src/www/vistas/nueva_entidad_listado.php -->
+<?php require __DIR__ . '/parciales/header.php'; ?>
+<main>
+    <h1>Nueva Entidad</h1>
+    <!-- Contenido -->
+</main>
+<?php require __DIR__ . '/parciales/footer.php'; ?>
+```
+
+### 5. Enrutamiento
+
+```php
+// Añadir en index.php
+case 'nueva_entidad':
+    if (($_SESSION['tipo_usuario'] ?? '') !== 'administrador') {
+        header('Location: index.php'); exit;
+    }
+    $ctrl = new ControladorNuevaEntidad();
+    match ($accion) {
+        'crear' => $ctrl->crear(),
+        default => $ctrl->listado()
+    };
+    break;
+```
+
+---
+
+## Pruebas automatizadas
+
+### Estructura de pruebas
+
+```
+src/tests/
+├── bootstrap.php        # Configuración de PHPUnit
+├── phpunit.xml          # Configuración XML
+├── unit/                # Pruebas unitarias
+│   ├── TestCase.php     # Clase base
+│   └── modelos/         # Pruebas de modelos
+├── functional/          # Pruebas funcionales
+│   └── controladores/   # Pruebas de controladores
+├── integration/         # Pruebas de integración
+│   └── FlujoCompletoTest.php
+└── user/                # Casos de prueba UAT
+    ├── CHECKLIST_PRUEBAS.md
+    └── PRUEBAS_USUARIO_UAT.md
+```
+
+### Ejecución
+
+```bash
+cd src/tests
+composer install
+composer test           # Todas las pruebas
+composer test:unit      # Solo unitarias
+composer test:coverage  # Con cobertura
+```
+
+---
+
+## Depuración y registro de errores
+
+### Configuración
+
+```php
+// config.php
+define('APP_DEPURACION', false);  // TRUE en desarrollo
+
+set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+    if (!APP_DEPURACION) {
+        error_log("[ERROR] $errstr en $errfile:$errline");
+        return true;
+    }
+    return false;
+});
+
+set_exception_handler(function ($ex) {
+    error_log('[EXCEPCIÓN] ' . $ex->getMessage());
+    if (APP_DEPURACION) {
+        echo '<pre>' . htmlspecialchars($ex->getMessage()) . '</pre>';
+    } else {
+        echo MSJ_ERROR_GENERAL;
+    }
+});
+```
+
+### Registro de eventos
+
+```php
+error_log('[INFO] Usuario ' . $id . ' ha iniciado sesión');
+error_log('[WARNING] Intento de acceso no autorizado');
+error_log('[ERROR] Fallo en consulta: ' . $e->getMessage());
+```
+
+---
+
+## Despliegue y configuración
+
+### Desarrollo local (XAMPP)
+
+```
+URL: http://localhost/Sprint-3/src/www/
+Ruta física: C:\xampp\htdocs\Sprint-3\src\www\
+```
+
+### Variables de configuración
+
+```php
+// config.php
+define('APP_DEPURACION', false);
+define('BD_HOST', '127.0.0.1');
+define('BD_NOMBRE', 'intra_vb');
+define('BD_USUARIO', 'root');
+define('BD_PASSWORD', '');
+```
+
+### Checklist de producción
+
+- [ ] `APP_DEPURACION = false`
+- [ ] Credenciales de BD seguras
+- [ ] HTTPS habilitado
+- [ ] Backups de BD configurados
+- [ ] Logs de errores activos
+- [ ] Permisos de archivos restringidos
+
+---
+
+## Documentación adicional
+
+| Documento | Ubicación |
+|-----------|-----------|
+| Manual de Instalación | `docs/Manual Instalación/Manual_de_Instalacion.md` |
+| Manual de Usuario | `docs/Manual Usuario/Manual_de_Usuario.md` |
+| Documentación API (PHPDoc/JSDoc) | `docs/Manual Programador/Documentacion_API.md` |
+| Pruebas del Sistema | `docs/Manual Programador/Pruebas.md` |
+| Arquitectura Técnica | `docs/Análisis/Arquitectura Tecnológica/Arquitectura_Tecnica.md` |
+| Guía de Estilos | `docs/Diseño/Guía de Estilos/Guia_de_Estilos.md` |
+| Accesibilidad WCAG | `docs/Diseño/Usabilidad/Accesibilidad_WCAG_AAA.md` |
+| Principios de Nielsen | `docs/Diseño/Usabilidad/Principios_Nielsen.md` |
+
+---
+
+*Documentación técnica para desarrolladores del proyecto Sprint-3.*
+
+// Antonio Gat Fernández | agatf02@educarex.es

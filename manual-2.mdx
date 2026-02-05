@@ -1,0 +1,298 @@
+---
+title: 'Manual'
+---
+
+## Índice
+
+1. [Acceso a la aplicación](#acceso-a-la-aplicación)
+2. [Roles y menús principales](#roles-y-menús-principales)
+3. [Iniciar y cerrar sesión](#iniciar-y-cerrar-sesión)
+4. [Cambiar contraseña](#cambiar-contraseña)
+5. [Funcionalidades del Administrador](#funcionalidades-del-administrador)
+6. [Funcionalidades del Árbitro](#funcionalidades-del-árbitro)
+
+---
+
+## Acceso a la aplicación
+
+- **URL local (XAMPP):** `http://localhost/Sprints-pi/Sprint-3/src/www/`
+- Introduce tu usuario y contraseña en la pantalla de inicio de sesión.
+- Si no recuerdas tu contraseña, contacta con el Administrador del sistema.
+
+### Usuarios de ejemplo (datos iniciales)
+
+| Rol           | Usuario    | Contraseña |
+|---------------|------------|------------|
+| Administrador | `admin`    | `123contra`   |
+| Árbitro       | `arbitro1` | `123contra`   |
+| Árbitro       | `arbitro2` | `123contra`   |
+| Árbitro       | `arbitro3` | `123contra`   |
+
+> **Nota:** Si el sistema detecta que tienes una contraseña temporal, te obligará a cambiarla antes de continuar.
+
+---
+
+## Roles y menús principales
+
+### Administrador
+
+| Menú                     | Descripción                                           |
+|--------------------------|-------------------------------------------------------|
+| Dashboard                | Panel con estadísticas generales del sistema          |
+| Partidos                 | Gestión completa de partidos (CRUD)                   |
+| Usuarios                 | Gestión de usuarios del sistema (CRUD)                |
+| Árbitros                 | Listado y gestión de árbitros                         |
+| Licencias                | Gestión de licencias federativas                      |
+| Liquidaciones            | Gestión de liquidaciones económicas                   |
+| Disponibilidad Árbitros  | Consulta de disponibilidad por fecha                  |
+| Rectificaciones          | Gestión de solicitudes de rectificación               |
+| Perfil                   | Ver y editar datos del perfil propio                  |
+
+### Árbitro
+
+| Menú              | Descripción                                      |
+|-------------------|--------------------------------------------------|
+| Dashboard         | Panel con resumen de partidos asignados          |
+| Mis Partidos      | Listado de partidos asignados (futuros/pasados)  |
+| Mis Liquidaciones | Consulta de liquidaciones propias                |
+| Disponibilidad    | Gestionar disponibilidad horaria                 |
+| Lista Árbitros    | Ver compañeros árbitros de la plataforma         |
+| Perfil            | Ver y editar datos del perfil propio             |
+
+El sistema muestra **mensajes informativos ("flash")** en la parte superior tras realizar acciones importantes.
+
+---
+
+## Iniciar y cerrar sesión
+
+### Iniciar sesión
+1. Abre la URL de acceso en tu navegador.
+2. Introduce tu **usuario** y **contraseña**.
+3. Pulsa el botón **Iniciar sesión**.
+4. Serás redirigido al Dashboard correspondiente a tu rol.
+
+### Cerrar sesión
+1. En cualquier página, localiza la opción **Cerrar sesión** en el menú.
+2. Pulsa para finalizar tu sesión de forma segura.
+
+---
+
+## Cambiar contraseña
+
+1. Accede a: **Menú → Perfil** o directamente si el sistema te obliga por tener contraseña temporal.
+2. Introduce tu **contraseña actual**.
+3. Escribe la **nueva contraseña** y confírmala.
+4. Pulsa **Guardar cambios**.
+5. Si la contraseña actual es incorrecta o las nuevas no coinciden, se mostrará un mensaje de error.
+
+---
+
+## Funcionalidades del Administrador
+
+### Dashboard Administrativo
+
+El Dashboard muestra estadísticas generales del sistema:
+- **Total de usuarios** registrados
+- **Total de árbitros** activos
+- **Total de partidos** programados
+- **Total de liquidaciones** generadas
+
+### Gestión de Partidos
+
+#### Listado de partidos
+- Accede a: **Menú → Partidos**.
+- Visualiza una tabla con: fecha, equipos, categoría, pabellón y árbitros asignados.
+
+#### Crear un partido
+1. En la vista de Partidos, pulsa **"Nuevo partido"**.
+2. Completa los campos obligatorios:
+   - Equipo local
+   - Equipo visitante
+   - Categoría
+   - Fecha y hora
+   - Pabellón
+3. Opcionalmente asigna:
+   - Árbitro principal
+   - Árbitro segundo
+   - Anotador
+4. Pulsa **Guardar**. El sistema validará que los equipos no sean iguales.
+
+#### Editar un partido
+1. En el listado, pulsa **"Editar"** en la fila del partido.
+2. Modifica los datos necesarios.
+3. Pulsa **Guardar** para aplicar los cambios.
+
+#### Eliminar un partido
+1. En el listado, pulsa **"Eliminar"** en la fila del partido.
+2. Confirma la eliminación. **Esta acción es irreversible.**
+
+### Gestión de Usuarios
+
+#### Listado de usuarios
+- Accede a: **Menú → Usuarios**.
+- Visualiza todos los usuarios con su rol, estado y datos de contacto.
+
+#### Crear un usuario
+1. Pulsa **"Nuevo usuario"**.
+2. Completa: nombre de usuario, contraseña, email, tipo de usuario.
+3. Si es árbitro, se creará automáticamente el registro de árbitro asociado.
+4. Pulsa **Guardar**.
+
+#### Editar un usuario
+1. Pulsa **"Editar"** en la fila del usuario.
+2. Modifica los campos necesarios.
+3. Pulsa **Guardar** para aplicar cambios.
+
+#### Eliminar un usuario
+1. Pulsa **"Eliminar"** en la fila del usuario.
+2. Confirma la acción. **El usuario será eliminado permanentemente.**
+
+### Gestión de Árbitros
+
+#### Listado de árbitros
+- Accede a: **Menú → Árbitros**.
+- Visualiza datos: nombre, alias, categoría, número de licencia, email, teléfono.
+
+#### Detalle de árbitro
+1. Pulsa sobre el nombre del árbitro para ver información detallada.
+2. Consulta estadísticas de partidos arbitrados.
+
+#### Editar árbitro
+1. Pulsa **"Editar"** para modificar datos del árbitro.
+2. Actualiza: alias, categoría, licencia, datos de contacto, datos bancarios.
+3. Pulsa **Guardar**.
+
+### Gestión de Licencias
+
+#### Listado de licencias
+- Accede a: **Menú → Licencias**.
+- Visualiza las licencias federativas registradas.
+
+#### Crear licencia
+1. Pulsa **"Nueva licencia"**.
+2. Introduce el número de licencia y selecciona el árbitro.
+3. Pulsa **Guardar**.
+
+#### Editar/Eliminar licencia
+- Usa los botones correspondientes en cada fila del listado.
+
+### Gestión de Liquidaciones
+
+#### Listado de liquidaciones
+- Accede a: **Menú → Liquidaciones**.
+- Visualiza todas las liquidaciones con: árbitro, período, importe, estado.
+
+#### Crear liquidación
+1. Pulsa **"Nueva liquidación"**.
+2. Selecciona el árbitro y el período.
+3. El sistema calculará automáticamente los partidos y el importe.
+4. Pulsa **Guardar**.
+
+#### Detalle de liquidación
+- Pulsa sobre una liquidación para ver el desglose de partidos e importes.
+
+#### Regenerar partidos
+- Permite recalcular los partidos incluidos en una liquidación.
+
+#### Gestión de rectificaciones
+- Accede a: **Menú → Liquidaciones → Rectificaciones**.
+- Revisa las solicitudes de rectificación enviadas por árbitros.
+- Aprueba o rechaza cada solicitud.
+
+### Consulta de Disponibilidad de Árbitros
+
+1. Accede a: **Menú → Disponibilidad Árbitros**.
+2. Selecciona una **fecha** en el calendario.
+3. Pulsa **Consultar**.
+4. El sistema mostrará los árbitros disponibles para esa fecha, indicando:
+   - Disponibilidad en franja **mañana**
+   - Disponibilidad en franja **tarde**
+   - Observaciones del árbitro
+
+---
+
+## Funcionalidades del Árbitro
+
+### Dashboard del Árbitro
+
+El Dashboard muestra un resumen de tu actividad:
+- **Total de partidos** asignados
+- **Partidos pendientes** (futuros)
+- **Partidos completados** (finalizados)
+- Listado de **próximos partidos**
+
+### Mis Partidos
+
+- Accede a: **Menú → Mis Partidos**.
+- Los partidos se separan en dos secciones:
+  - **Partidos futuros:** pendientes de celebrar
+  - **Partidos pasados:** ya finalizados
+- En cada partido verás tu rol asignado:
+  - **1º Árbitro** (árbitro principal)
+  - **2º Árbitro** (árbitro segundo)
+  - **Anotador**
+
+### Mis Liquidaciones
+
+- Accede a: **Menú → Mis Liquidaciones**.
+- Consulta el histórico de tus liquidaciones económicas.
+- Pulsa sobre una liquidación para ver el **detalle** con el desglose de partidos.
+
+#### Solicitar rectificación
+1. En el detalle de una liquidación, pulsa **"Solicitar rectificación"**.
+2. Describe el motivo de la rectificación.
+3. Pulsa **Enviar**. El administrador revisará tu solicitud.
+
+### Mi Disponibilidad
+
+- Accede a: **Menú → Disponibilidad**.
+- Para cada fecha, marca tu disponibilidad:
+  -  **Mañana** (disponible)
+  -  **Tarde** (disponible)
+- Añade **observaciones** si es necesario (por ejemplo: "Solo disponible a partir de las 11:00").
+- Pulsa **Guardar** para registrar tu disponibilidad.
+
+> **Nota:** No puedes crear disponibilidad duplicada para la misma fecha.
+
+### Lista de Árbitros (Compañeros)
+
+- Accede a: **Menú → Lista Árbitros**.
+- Consulta el listado de otros árbitros de la plataforma.
+- Visualiza datos públicos: nombre, alias, categoría.
+
+### Mi Perfil
+
+1. Accede a: **Menú → Perfil**.
+2. Visualiza y edita tus datos personales:
+   - Nombre completo
+   - DNI (si aplica)
+   - Email
+   - Localidad (si aplica)
+   - Teléfono (si aplica)
+   - Datos bancarios (si aplica)
+3. Pulsa **Guardar** para actualizar tu información.
+
+---
+
+## Mensajes del Sistema
+
+El sistema utiliza mensajes flash para informar sobre el resultado de las acciones:
+
+| Tipo    | Significado                          |
+|---------|--------------------------------------|
+|  Éxito  | La acción se completó correctamente  |
+|  Aviso  | Información importante a considerar  |
+|  Error  | La acción no pudo completarse        |
+
+---
+
+## Soporte
+
+Si experimentas problemas con la aplicación:
+1. Verifica que has introducido correctamente tus credenciales.
+2. Limpia la caché de tu navegador.
+3. Contacta con el **Administrador del sistema** para asistencia.
+
+---
+
+Antonio Gat Fernández | agatf02@educarex.es
