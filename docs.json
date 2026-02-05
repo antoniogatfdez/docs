@@ -27,12 +27,24 @@
         "tab": "PROYECTOS",
         "dropdowns": [
           {
-            "dropdown": "Proyectos",
+            "dropdown": "Untitled Dropdown"
+          },
+          {
+            "dropdown": "Intranet FedexVB",
+            "color": {
+              "light": "#3d6ebb",
+              "dark": "#3d6ebb"
+            },
             "groups": [
               {
                 "group": "Intranet FedexVB",
                 "pages": []
-              },
+              }
+            ]
+          },
+          {
+            "dropdown": "IntraVB",
+            "groups": [
               {
                 "group": "IntraVB",
                 "pages": [
