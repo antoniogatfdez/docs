@@ -1,0 +1,292 @@
+---
+title: 'Historias de Usuario'
+---
+
+## Historias de Usuario y Criterios de Aceptación
+
+### CU-01 — Inicio de Sesión (Administrador / Árbitro)
+Como usuario registrado, quiero iniciar sesión con mi correo y contraseña para acceder a la aplicación según mi rol.
+
+Criterios de aceptación:
+- Dado que estoy en la pantalla de login, cuando ingreso un correo y contraseña válidos, entonces accedo al dashboard correspondiente a mi rol.
+- Dado que ingreso credenciales inválidas, cuando intento iniciar sesión, entonces veo un mensaje claro de error sin revelar detalles sensibles.
+
+---
+
+### CU-02 — Cerrar Sesión (Administrador / Árbitro)
+Como usuario autenticado, quiero cerrar sesión para finalizar mi acceso a la aplicación.
+
+Criterios de aceptación:
+- Dado que estoy autenticado, cuando hago clic en "Cerrar sesión", entonces se destruye la sesión y soy redirigido a la pantalla de login.
+- Dado que cierro sesión, cuando intento volver con el botón atrás, entonces no puedo acceder a páginas protegidas.
+
+---
+
+### CU-03 — Control de Acceso por Rol (Administrador / Árbitro)
+Como sistema, debo restringir el acceso a rutas y acciones según rol (Administrador, Árbitro).
+
+Criterios de aceptación:
+- Dado que soy Árbitro, cuando intento acceder a funciones de administración, entonces el sistema lo impide y muestra mensaje de acceso denegado.
+- Dado que soy Administrador, cuando accedo a cualquier módulo de gestión, entonces puedo realizar todas las acciones permitidas.
+
+---
+
+### CU-04 — Crear usuarios (Administrador)
+Como Administrador, quiero crear nuevos usuarios para gestionar el acceso a la plataforma.
+
+Criterios de aceptación:
+- Dado que estoy autenticado como Administrador, cuando completo el formulario con datos válidos, entonces el usuario queda guardado en la base de datos.
+- Dado que algunos campos obligatorios están vacíos o inválidos, cuando envío el formulario, entonces veo mensajes de validación claros.
+
+---
+
+### CU-05 — Editar usuarios (Administrador)
+Como Administrador, quiero editar los datos de un usuario existente para corregir o actualizar información.
+
+Criterios de aceptación:
+- Dado que selecciono un usuario, cuando abro la edición, entonces el formulario muestra los campos precargados.
+- Dado que guardo cambios válidos, cuando confirmo, entonces se persisten y la lista refleja la actualización.
+
+---
+
+### CU-06 — Listar usuarios (Administrador)
+Como Administrador, quiero ver un listado de usuarios para gestionar el acceso a la plataforma.
+
+Criterios de aceptación:
+- Dado que existen usuarios, cuando abro la vista de listado, entonces veo una tabla con los usuarios registrados.
+- Dado que aplico filtros o búsqueda, cuando los envío, entonces la tabla se actualiza mostrando solo los registros filtrados.
+
+---
+
+### CU-07 — Borrar usuarios (Administrador)
+Como Administrador, quiero eliminar un usuario para mantener limpia la base de datos.
+
+Criterios de aceptación:
+- Dado que estoy en el listado, cuando hago clic en eliminar y confirmo, entonces el registro se elimina y la interfaz se actualiza.
+- Dado que cancelo la confirmación, cuando hago clic en eliminar, entonces no se elimina el registro.
+
+---
+
+### CU-08 — Crear partidos (Administrador)
+Como Administrador, quiero crear un partido registrando fecha, hora, equipos, sede y observaciones para gestionar la competición.
+
+Criterios de aceptación:
+- Dado que estoy autenticado como Administrador, cuando completo el formulario con datos válidos, entonces el partido queda guardado en la base de datos.
+- Dado que algunos campos obligatorios están vacíos o inválidos, cuando envío el formulario, entonces veo mensajes de validación claros.
+
+---
+
+### CU-09 — Editar partidos (Administrador)
+Como Administrador, quiero editar los datos de un partido existente para corregir o actualizar información.
+
+Criterios de aceptación:
+- Dado que selecciono un partido, cuando abro la edición, entonces el formulario muestra los campos precargados.
+- Dado que guardo cambios válidos, cuando confirmo, entonces se persisten y la lista refleja la actualización.
+
+---
+
+### CU-10 — Listar partidos (Administrador / Árbitro)
+Como usuario autorizado, quiero ver un listado de partidos con filtros para facilitar la gestión.
+
+Criterios de aceptación:
+- Dado que existen partidos, cuando abro la vista de listado, entonces veo una tabla ordenada por fecha.
+- Dado que aplico filtros, cuando los envío, entonces la tabla se actualiza mostrando solo los registros filtrados.
+- Dado que soy Árbitro, cuando accedo al listado, entonces solo veo los partidos asignados a mí.
+
+---
+
+### CU-11 — Borrar partidos (Administrador)
+Como Administrador, quiero eliminar un partido para mantener limpia la base de datos.
+
+Criterios de aceptación:
+- Dado que estoy en el listado, cuando hago clic en eliminar y confirmo, entonces el registro se elimina y la interfaz se actualiza.
+- Dado que cancelo la confirmación, cuando hago clic en eliminar, entonces no se elimina el registro.
+
+---
+
+### CU-12 — Crear liquidaciones (Administrador)
+Como Administrador, quiero crear liquidaciones para gestionar los pagos a los árbitros.
+
+Criterios de aceptación:
+- Dado que estoy autenticado como Administrador, cuando completo el formulario con datos válidos, entonces la liquidación queda guardada.
+- Dado que algunos campos obligatorios están vacíos o inválidos, cuando envío el formulario, entonces veo mensajes de validación claros.
+
+---
+
+### CU-13 — Editar liquidaciones (Administrador)
+Como Administrador, quiero editar los datos de una liquidación existente para corregir o actualizar información.
+
+Criterios de aceptación:
+- Dado que selecciono una liquidación, cuando abro la edición, entonces el formulario muestra los campos precargados.
+- Dado que guardo cambios válidos, cuando confirmo, entonces se persisten y la lista refleja la actualización.
+
+---
+
+### CU-14 — Listar liquidaciones (Administrador / Árbitro)
+Como usuario autorizado, quiero ver un listado de liquidaciones para consultar los pagos.
+
+Criterios de aceptación:
+- Dado que existen liquidaciones, cuando abro la vista de listado, entonces veo una tabla con las liquidaciones.
+- Dado que soy Árbitro, cuando accedo al listado, entonces solo veo mis propias liquidaciones.
+
+---
+
+### CU-15 — Borrar liquidaciones (Administrador)
+Como Administrador, quiero eliminar una liquidación para mantener limpia la base de datos.
+
+Criterios de aceptación:
+- Dado que estoy en el listado, cuando hago clic en eliminar y confirmo, entonces el registro se elimina y la interfaz se actualiza.
+- Dado que cancelo la confirmación, cuando hago clic en eliminar, entonces no se elimina el registro.
+
+---
+
+### CU-16 — Crear licencias (Administrador)
+Como Administrador, quiero crear licencias para gestionar las credenciales de los árbitros.
+
+Criterios de aceptación:
+- Dado que estoy autenticado como Administrador, cuando completo el formulario con datos válidos, entonces la licencia queda guardada.
+- Dado que algunos campos obligatorios están vacíos o inválidos, cuando envío el formulario, entonces veo mensajes de validación claros.
+
+---
+
+### CU-17 — Editar licencias (Administrador)
+Como Administrador, quiero editar los datos de una licencia existente para corregir o actualizar información.
+
+Criterios de aceptación:
+- Dado que selecciono una licencia, cuando abro la edición, entonces el formulario muestra los campos precargados.
+- Dado que guardo cambios válidos, cuando confirmo, entonces se persisten y la lista refleja la actualización.
+
+---
+
+### CU-18 — Listar licencias (Administrador)
+Como Administrador, quiero ver un listado de licencias para gestionar las credenciales de los árbitros.
+
+Criterios de aceptación:
+- Dado que existen licencias, cuando abro la vista de listado, entonces veo una tabla con las licencias registradas.
+- Dado que aplico filtros o búsqueda, cuando los envío, entonces la tabla se actualiza mostrando solo los registros filtrados.
+
+---
+
+### CU-19 — Borrar licencias (Administrador)
+Como Administrador, quiero eliminar una licencia para mantener limpia la base de datos.
+
+Criterios de aceptación:
+- Dado que estoy en el listado, cuando hago clic en eliminar y confirmo, entonces el registro se elimina y la interfaz se actualiza.
+- Dado que cancelo la confirmación, cuando hago clic en eliminar, entonces no se elimina el registro.
+
+---
+
+### CU-20 — Editar árbitros (Administrador)
+Como Administrador, quiero editar los datos de un árbitro existente para actualizar su información.
+
+Criterios de aceptación:
+- Dado que selecciono un árbitro, cuando abro la edición, entonces el formulario muestra los campos precargados.
+- Dado que guardo cambios válidos, cuando confirmo, entonces se persisten y la lista refleja la actualización.
+
+---
+
+### CU-21 — Listar árbitros (Administrador)
+Como Administrador, quiero ver un listado de árbitros para gestionar el equipo arbitral.
+
+Criterios de aceptación:
+- Dado que existen árbitros, cuando abro la vista de listado, entonces veo una tabla con los árbitros registrados.
+- Dado que aplico filtros o búsqueda, cuando los envío, entonces la tabla se actualiza mostrando solo los registros filtrados.
+
+---
+
+### CU-22 — Crear disponibilidad (Árbitro)
+Como Árbitro, quiero registrar mi disponibilidad para que el administrador pueda asignarme partidos.
+
+Criterios de aceptación:
+- Dado que estoy autenticado como Árbitro, cuando selecciono fechas disponibles, entonces mi disponibilidad queda guardada.
+- Dado que ya tengo disponibilidad registrada, cuando modifico las fechas, entonces se actualiza correctamente.
+
+---
+
+### CU-23 — Listar disponibilidad (Árbitro)
+Como Árbitro, quiero ver mi disponibilidad registrada para gestionar mis fechas.
+
+Criterios de aceptación:
+- Dado que tengo disponibilidad registrada, cuando abro la vista, entonces veo un calendario o listado con mis fechas disponibles.
+
+---
+
+### CU-24 — Consultar Disponibilidad de Árbitros (Administrador)
+Como Administrador, quiero consultar la disponibilidad de los árbitros para asignar partidos correctamente.
+
+Criterios de aceptación:
+- Dado que existen disponibilidades registradas, cuando consulto por fecha, entonces veo qué árbitros están disponibles.
+- Dado que selecciono un árbitro, cuando consulto su disponibilidad, entonces veo sus fechas disponibles.
+
+---
+
+### CU-25 — Gestionar Mi Perfil (Administrador / Árbitro)
+Como usuario autenticado, quiero gestionar mi perfil para actualizar mis datos personales.
+
+Criterios de aceptación:
+- Dado que accedo a mi perfil, cuando veo la vista, entonces se muestran mis datos actuales.
+- Dado que modifico mis datos y guardo, cuando confirmo, entonces los cambios se persisten correctamente.
+- Dado que cambio mi contraseña, cuando confirmo, entonces la nueva contraseña queda activa.
+
+---
+
+### CU-26 — Crear rectificaciones (Árbitro)
+Como Árbitro, quiero crear una solicitud de rectificación para corregir errores en mis liquidaciones.
+
+Criterios de aceptación:
+- Dado que estoy autenticado como Árbitro, cuando completo el formulario de rectificación, entonces la solicitud queda registrada.
+- Dado que algunos campos obligatorios están vacíos, cuando envío el formulario, entonces veo mensajes de validación.
+
+---
+
+### CU-27 — Editar rectificaciones (Administrador)
+Como Administrador, quiero editar el estado de una rectificación para aprobarla o rechazarla.
+
+Criterios de aceptación:
+- Dado que selecciono una rectificación, cuando abro la edición, entonces veo los detalles y puedo cambiar el estado.
+- Dado que apruebo o rechazo la rectificación, cuando confirmo, entonces el estado se actualiza.
+
+---
+
+### CU-28 — Listar rectificaciones (Administrador)
+Como Administrador, quiero ver un listado de rectificaciones para gestionar las solicitudes pendientes.
+
+Criterios de aceptación:
+- Dado que existen rectificaciones, cuando abro la vista de listado, entonces veo una tabla con las solicitudes.
+- Dado que aplico filtros por estado, cuando los envío, entonces la tabla muestra solo los registros filtrados.
+
+---
+
+### CU-29 — Listado de Compañeros (Árbitros)
+Como Árbitro, quiero ver un listado de mis compañeros árbitros para contactar con ellos.
+
+Criterios de aceptación:
+- Dado que existen otros árbitros, cuando abro la vista de listado, entonces veo una tabla con la información de contacto básica.
+
+---
+
+### CU-30 — Accesibilidad de la Página
+Como usuario, quiero que la página cumpla con estándares de accesibilidad para poder usarla sin barreras.
+
+Criterios de aceptación:
+- Dado que navego por la aplicación, cuando uso un lector de pantalla, entonces puedo acceder a todo el contenido.
+- Dado que tengo dificultades visuales, cuando uso la aplicación, entonces el contraste y tamaño de fuente son adecuados.
+- Dado que navego con teclado, cuando uso Tab y Enter, entonces puedo acceder a todas las funciones.
+
+---
+
+### CU-31 — Cambio de Contraseña (Administrador / Árbitro)
+Como usuario autenticado, quiero cambiar mi contraseña para mantener la seguridad de mi cuenta.
+
+Criterios de aceptación:
+- Dado que estoy autenticado, cuando accedo a la opción de cambiar contraseña, entonces veo un formulario con los campos necesarios.
+- Dado que introduzco mi contraseña actual correcta y una nueva contraseña válida, cuando confirmo el cambio, entonces la contraseña se actualiza correctamente.
+- Dado que introduzco una contraseña actual incorrecta, cuando intento cambiarla, entonces veo un mensaje de error indicando que la contraseña actual no es correcta.
+- Dado que la nueva contraseña no cumple los requisitos de seguridad, cuando intento guardar, entonces veo un mensaje indicando los requisitos mínimos.
+- Dado que la confirmación de la nueva contraseña no coincide, cuando intento guardar, entonces veo un mensaje de error indicando que las contraseñas no coinciden.
+
+
+
+---
+
+ Antonio Gat Fernández | agatf02@educarex.es

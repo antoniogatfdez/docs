@@ -35,7 +35,47 @@
               },
               {
                 "group": "IntraVB",
-                "pages": []
+                "pages": [
+                  {
+                    "group": "Análisis",
+                    "pages": [
+                      {
+                        "group": "Arquitectura Tecnológica",
+                        "pages": [
+                          "arquitectura"
+                        ]
+                      },
+                      {
+                        "group": "Historias de Usuario",
+                        "pages": [
+                          "historias-de-usuario"
+                        ]
+                      },
+                      {
+                        "group": "Product Backlog",
+                        "pages": [
+                          "backlog"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Diseño",
+                    "pages": []
+                  },
+                  {
+                    "group": "Manual de Instalación",
+                    "pages": []
+                  },
+                  {
+                    "group": "Manual de Programación",
+                    "pages": []
+                  },
+                  {
+                    "group": "Manual de Usuario",
+                    "pages": []
+                  }
+                ]
               }
             ]
           }
