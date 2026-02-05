@@ -27,9 +27,6 @@
         "tab": "PROYECTOS",
         "dropdowns": [
           {
-            "dropdown": "Untitled Dropdown"
-          },
-          {
             "dropdown": "Intranet FedexVB",
             "color": {
               "light": "#3d6ebb",
