@@ -16,8 +16,11 @@
           {
             "group": "Documentos",
             "icon": "folder",
-            "pages": []
-          }
+            "pages": [
+              "ips-elasticas-aws"
+            ]
+          },
+          "licencia"
         ]
       },
       {

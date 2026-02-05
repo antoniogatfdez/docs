@@ -1,0 +1,40 @@
+---
+title: 'IP Elasticas de AWS (usando CloudFlare como tunel)'
+---
+
+Voy a explicar como conseguir una IP fija usando las "IP elásticas" de AWS.
+
+1. Creas tu instancia EC2 en AWS.
+2. En el menú izquierdo en el Panel AWS.
+3. Vamos hasta la sección "Red y seguridad".
+4. Seleccionamos la opción: "Direcciones IP elásticas".
+5. Pulsamos en el botón "Asignar dirección IP elástica".
+6. En está página te da a elegir la intancia que quieres asignar a la IP. 
+    (IMPORTANTE: si no le asignas instancia te consumirá recursos )
+7. El panel de AWS te indicará la IP que se ha asignado a tu instancia.
+
+## Cloudflare
+1. Registras o conectas tu dominio en/a Cloudflare.
+2. En el menú izquierdo seleccionas el apartado "DNS" y pulsas en "Registros".
+3. En esta página pulsas "Agregar registro", en este indicarás * si quieres usar el propio dominio o cualquiero otro nombre si quieres un subdominio (EJ: apache, kuma, ...) y la IP que te asigna AWS a la instancia.
+
+## Caddy
+1. Crear la red con la que realizaremos el proxy inverso.
+2. Tener el contenedor de Caddy levantado.
+3. En cada contenerdor indicar lo siguiente:
+```
+    labels:
+        caddy:  subdominio.dominio.es/com/net
+        caddy.reverse_proxy: "{{upstreams puerto_servicio}}"
+        networks:
+        - red
+
+networks:
+  red:
+    external: true
+```
+
+Con esto ya puedes acceder al dominio o subdominio para acceder al servicio del contenedor levantado.
+
+
+Antonio Gat Fernandez - hola@antoniogatfdez.com
