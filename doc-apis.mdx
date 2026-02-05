@@ -2,48 +2,6 @@
 title: 'Doc APIs'
 ---
 
-## Tabla de Contenido
-
-- [Documentación de la API - PHPDoc y JSDoc](#documentación-de-la-api---phpdoc-y-jsdoc)
-  - [Tabla de Contenido](#tabla-de-contenido)
-  - [1. Introducción](#1-introducción)
-  - [2. Documentación PHP (PHPDoc)](#2-documentación-php-phpdoc)
-    - [2.1 Modelos](#21-modelos)
-      - [ModeloBase](#modelobase)
-      - [ModeloUsuario](#modelousuario)
-      - [ModeloArbitro](#modeloarbitro)
-      - [ModeloPartido](#modelopartido)
-      - [ModeloCategoria](#modelocategoria)
-      - [ModeloDisponibilidad](#modelodisponibilidad)
-      - [ModeloLicencia](#modelolicencia)
-      - [ModeloLiquidacion](#modeloliquidacion)
-    - [2.2 Controladores](#22-controladores)
-      - [ControladorAutenticacion](#controladorautenticacion)
-      - [ControladorUsuario](#controladorusuario)
-      - [ControladorArbitro](#controladorarbitro)
-      - [ControladorPartido](#controladorpartido)
-      - [ControladorDisponibilidad](#controladordisponibilidad)
-      - [ControladorPerfil](#controladorperfil)
-      - [ControladorLicencia](#controladorlicencia)
-      - [ControladorLiquidacion](#controladorliquidacion)
-  - [3. Documentación JavaScript (JSDoc)](#3-documentación-javascript-jsdoc)
-    - [3.1 Módulo Principal (app.js)](#31-módulo-principal-appjs)
-    - [3.2 Módulo de Usuarios (usuarios.js)](#32-módulo-de-usuarios-usuariosjs)
-    - [3.3 Módulo de Partidos (partidos.js)](#33-módulo-de-partidos-partidosjs)
-    - [3.4 Módulo de Árbitros (arbitros.js)](#34-módulo-de-árbitros-arbitrosjs)
-    - [3.5 Módulo de Disponibilidad (disponibilidad.js)](#35-módulo-de-disponibilidad-disponibilidadjs)
-    - [3.6 Módulo de Liquidaciones (liquidaciones.js)](#36-módulo-de-liquidaciones-liquidacionesjs)
-    - [3.7 Módulo de Licencias (licencias.js)](#37-módulo-de-licencias-licenciasjs)
-    - [3.8 Módulo de Modales (modales.js)](#38-módulo-de-modales-modalesjs)
-    - [3.9 Módulo Cambiar Contraseña (cambiar\_password.js)](#39-módulo-cambiar-contraseña-cambiar_passwordjs)
-    - [3.10 Módulo WCAG AAA (wcag-aaa.js)](#310-módulo-wcag-aaa-wcag-aaajs)
-    - [3.11 Módulo Nielsen (nielsen.js)](#311-módulo-nielsen-nielsenjs)
-  - [4. Convenciones de Documentación](#4-convenciones-de-documentación)
-    - [4.1 PHPDoc](#41-phpdoc)
-    - [4.2 JSDoc](#42-jsdoc)
-
----
-
 ## 1. Introducción
 
 Este documento describe la API interna del sistema de gestión de árbitros Sprint-3, documentada siguiendo los estándares **PHPDoc** para el código PHP y **JSDoc** para el código JavaScript.
