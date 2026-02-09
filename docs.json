@@ -117,7 +117,7 @@
   "navbar": {
     "links": [
       {
-        "label": "Soporte",
+        "label": "Contacto",
         "href": "mailto:hola@antoniogatfdez.com"
       }
     ],
@@ -153,7 +153,7 @@
   },
   "banner": {
     "dismissible": false,
-    "content": "|| EN DESARROLLO ||"
+    "content": " "
   },
   "errors": {
     "404": {
