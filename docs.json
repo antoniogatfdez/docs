@@ -114,10 +114,7 @@
       }
     ]
   },
-  "logo": {
-    "light": "/images/Proyecto_Creador_de_logotipos-removebg-preview.png",
-    "dark": "/images/Proyecto_Creador_de_logotipos-removebg-preview.png"
-  },
+  "logo": "/images/Proyecto_Creador_de_logotipos-removebg-preview.svg",
   "navbar": {
     "links": [
       {
