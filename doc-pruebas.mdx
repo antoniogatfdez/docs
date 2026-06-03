@@ -1,0 +1,215 @@
+---
+title: 'Doc Pruebas'
+---
+
+# Documentación de Pruebas del Sistema
+
+## Introducción
+
+Este documento describe la estrategia de pruebas implementada para el sistema de gestión de árbitros del Sprint-3. Se incluyen pruebas automatizadas y manuales para garantizar la calidad del software.
+
+---
+
+## Tipos de Pruebas Implementadas
+
+### 1. Pruebas Unitarias
+
+**Ubicación:** `src/tests/unit/`
+
+Las pruebas unitarias verifican el funcionamiento correcto de componentes individuales de forma aislada.
+
+#### Modelos Probados
+
+| Modelo | Archivo de Prueba | Casos de Prueba |
+|--------|-------------------|-----------------|
+| ModeloUsuario | ModeloUsuarioTest.php | 12 |
+| ModeloArbitro | ModeloArbitroTest.php | 10 |
+| ModeloPartido | ModeloPartidoTest.php | 11 |
+| ModeloDisponibilidad | ModeloDisponibilidadTest.php | 6 |
+| ModeloLiquidacion | ModeloLiquidacionTest.php | 8 |
+
+#### Aspectos Probados
+
+- **Operaciones CRUD**: Crear, leer, actualizar y eliminar registros
+- **Validaciones**: Datos obligatorios, formatos, duplicados
+- **Relaciones**: Integridad referencial entre tablas
+- **Cálculos**: Estadísticas, totales, importes
+
+---
+
+### 2. Pruebas Funcionales
+
+**Ubicación:** `src/tests/functional/`
+
+Las pruebas funcionales verifican el comportamiento de los controladores y flujos de la aplicación.
+
+#### Controladores Probados
+
+| Controlador | Archivo de Prueba | Casos de Prueba |
+|-------------|-------------------|-----------------|
+| ControladorAutenticacion | ControladorAutenticacionTest.php | 10 |
+| ControladorUsuario | ControladorUsuarioTest.php | 8 |
+
+#### Aspectos Probados
+
+- **Autenticación**: Login, logout, cambio de contraseña
+- **Autorización**: Permisos por rol
+- **Gestión**: CRUD de usuarios a través del controlador
+- **Sesiones**: Manejo de sesiones y mensajes flash
+
+---
+
+### 3. Pruebas de Integración
+
+**Ubicación:** `src/tests/integration/`
+
+Las pruebas de integración verifican flujos completos que involucran múltiples componentes.
+
+#### Flujos Probados
+
+| Flujo | Descripción |
+|-------|-------------|
+| Registro de Árbitro | Usuario → Árbitro → Cambio contraseña → Verificación |
+| Asignación de Partido | Árbitro → Partido → Estadísticas |
+| Gestión de Usuarios | Crear → Listar → Editar → Cambiar contraseña |
+| Múltiples Árbitros | Asignar 3 roles a un partido |
+
+---
+
+### 4. Pruebas de Usuario (UAT)
+
+**Ubicación:** `src/tests/user/`
+
+Casos de prueba manuales para validación por usuarios finales.
+
+#### Documentos
+
+- `PRUEBAS_USUARIO_UAT.md`: Casos detallados de aceptación
+- `CHECKLIST_PRUEBAS.md`: Lista rápida para ejecución
+
+#### Módulos Cubiertos
+
+| Módulo | Casos de Prueba |
+|--------|-----------------|
+| Autenticación | 6 |
+| Dashboard | 3 |
+| Gestión de Usuarios | 5 |
+| Gestión de Árbitros | 4 |
+| Gestión de Partidos | 6 |
+| Disponibilidad | 3 |
+| Liquidaciones | 4 |
+| Perfil | 5 |
+| UI/Navegación | 5 |
+| **Total** | **41** |
+
+---
+
+## Configuración del Entorno de Pruebas
+
+### Requisitos
+
+- PHP 8.1 o superior
+- MySQL 8.0 o superior
+- Composer
+- PHPUnit 10.x
+
+### Instalación
+
+```bash
+cd src/tests
+composer install
+```
+
+### Base de Datos de Pruebas
+
+```bash
+mysql -u root < sql/setup_test_db.sql
+```
+
+---
+
+## Ejecución de Pruebas
+
+### Todas las Pruebas Automatizadas
+
+```bash
+composer test
+```
+
+### Por Suite
+
+```bash
+# Unitarias
+composer test:unit
+
+# Funcionales
+composer test:functional
+
+# Integración
+composer test:integration
+```
+
+### Con Cobertura
+
+```bash
+composer test:coverage
+```
+
+---
+
+## Matriz de Trazabilidad
+
+| Caso de Uso | Prueba Unitaria | Prueba Funcional | Prueba UAT |
+|-------------|-----------------|------------------|------------|
+| CU-001 Login | ✓ | ✓ | ✓ |
+| CU-002 Logout | ✓ | ✓ | ✓ |
+| CU-003 Cambiar Password | ✓ | ✓ | ✓ |
+| CU-004 Gestionar Usuarios | ✓ | ✓ | ✓ |
+| CU-005 Gestionar Árbitros | ✓ | - | ✓ |
+| CU-006 Gestionar Partidos | ✓ | - | ✓ |
+| CU-007 Registrar Disponibilidad | ✓ | - | ✓ |
+| CU-008 Ver Liquidaciones | ✓ | - | ✓ |
+| CU-009 Ver Perfil | - | - | ✓ |
+
+---
+
+## Métricas de Calidad
+
+### Objetivos de Cobertura
+
+| Métrica | Objetivo | Actual |
+|---------|----------|--------|
+| Cobertura de líneas | > 80% | Por medir |
+| Cobertura de métodos | > 90% | Por medir |
+| Cobertura de clases | 100% | Por medir |
+
+### Criterios de Aceptación
+
+- ✅ Todas las pruebas unitarias pasan
+- ✅ Todas las pruebas funcionales pasan
+- ✅ Todas las pruebas de integración pasan
+- ☐ 100% de pruebas UAT ejecutadas sin fallos críticos
+- ☐ Cobertura de código > 80%
+
+---
+
+## Mantenimiento de Pruebas
+
+### Añadir Nuevas Pruebas
+
+1. Crear archivo en la carpeta correspondiente
+2. Extender la clase TestCase apropiada
+3. Añadir anotaciones `@test` y `@group`
+4. Ejecutar para verificar
+
+### Convenciones de Nomenclatura
+
+- Archivos: `{Componente}Test.php`
+- Métodos: `test{Accion}{Resultado}` o `{accion}{Escenario}()`
+- Grupos: `@group {modulo}`, `@group {operacion}`
+
+---
+
+## Contacto
+
+Para más información sobre las pruebas, consultar al equipo de desarrollo.

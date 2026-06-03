@@ -1,0 +1,1987 @@
+---
+title: 'Doc APIs'
+---
+
+## 1. Introducción
+
+Este documento describe la API interna del sistema de gestión de árbitros Sprint-3, documentada siguiendo los estándares **PHPDoc** para el código PHP y **JSDoc** para el código JavaScript.
+
+La documentación incluye:
+- Descripción de clases y métodos
+- Parámetros de entrada y tipos de retorno
+- Ejemplos de uso cuando es pertinente
+- Relaciones entre componentes
+
+---
+
+## 2. Documentación PHP (PHPDoc)
+
+### 2.1 Modelos
+
+Los modelos se encuentran en `src/www/modelos/` y extienden de `ModeloBase`.
+
+---
+
+#### ModeloBase
+
+```php
+/**
+ * Clase base para modelos: centraliza la conexión PDO y utilidades comunes.
+ * 
+ * Proporciona la configuración de conexión a la base de datos MySQL
+ * con opciones de seguridad y manejo de errores.
+ * 
+ * @package    Modelos
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ModeloBase {
+    /**
+     * Instancia de conexión PDO.
+     * 
+     * @var PDO
+     */
+    protected $conexion;
+
+    /**
+     * Constructor - inicializa la conexión a base de datos.
+     */
+    public function __construct();
+
+    /**
+     * Crea y devuelve una instancia PDO configurada.
+     * 
+     * Configura la conexión con:
+     * - Modo de error: excepciones
+     * - Modo de fetch: arrays asociativos
+     * - Emulación de prepares desactivada
+     * 
+     * @return PDO Instancia de conexión configurada
+     * @throws PDOException Si falla la conexión
+     */
+    protected function crearConexion(): PDO;
+}
+```
+
+---
+
+#### ModeloUsuario
+
+```php
+/**
+ * ModeloUsuario: operaciones relacionadas con la tabla usuarios.
+ * 
+ * Gestiona la información básica de autenticación, tipo de usuario
+ * y operaciones CRUD completas sobre usuarios del sistema.
+ * 
+ * @package    Modelos
+ * @extends    ModeloBase
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ModeloUsuario extends ModeloBase {
+    /**
+     * Obtiene un usuario activo por nombre de usuario.
+     * 
+     * @param string $usuario Nombre de usuario a buscar
+     * @return array|null Datos del usuario o null si no existe
+     * 
+     * @example
+     * $modelo = new ModeloUsuario();
+     * $usuario = $modelo->obtenerPorUsuario('admin');
+     */
+    public function obtenerPorUsuario(string $usuario): ?array;
+
+    /**
+     * Registra un nuevo usuario en el sistema.
+     * 
+     * @param string $usuario         Nombre de usuario único
+     * @param string $email           Correo electrónico
+     * @param string $passwordPlano   Contraseña en texto plano (será hasheada)
+     * @param string $tipoUsuario     Tipo: 'administrador' o 'arbitro'
+     * @param bool   $passwordTemporal Si la contraseña es temporal
+     * @return int ID del usuario creado
+     * 
+     * @throws PDOException Si el usuario ya existe
+     */
+    public function crear(
+        string $usuario, 
+        string $email, 
+        string $passwordPlano, 
+        string $tipoUsuario = 'administrador', 
+        bool $passwordTemporal = false
+    ): int;
+
+    /**
+     * Obtiene un usuario por su identificador primario.
+     * 
+     * @param int $id Identificador del usuario
+     * @return array|null Datos del usuario o null si no existe
+     */
+    public function obtenerPorId(int $id): ?array;
+
+    /**
+     * Lista todos los usuarios activos.
+     * 
+     * @return array<int,array> Lista de usuarios ordenados por nombre
+     */
+    public function listarTodos(): array;
+
+    /**
+     * Actualiza los datos básicos de un usuario.
+     * 
+     * @param int    $id          Identificador del usuario
+     * @param string $usuario     Nuevo nombre de usuario
+     * @param string $email       Nuevo correo electrónico
+     * @param string $tipoUsuario Tipo de usuario
+     * @return bool True si la actualización fue exitosa
+     */
+    public function actualizar(int $id, string $usuario, string $email, string $tipoUsuario): bool;
+
+    /**
+     * Actualiza parcialmente los datos de un usuario.
+     * 
+     * @param int   $id    ID del usuario
+     * @param array $datos Array asociativo con campos a actualizar
+     * @return bool True si la actualización fue exitosa
+     */
+    public function actualizarParcial(int $id, array $datos): bool;
+
+    /**
+     * Cambia la contraseña de un usuario.
+     * 
+     * @param int    $id            ID del usuario
+     * @param string $nuevaPassword Nueva contraseña en texto plano
+     * @return bool True si el cambio fue exitoso
+     */
+    public function cambiarPassword(int $id, string $nuevaPassword): bool;
+
+    /**
+     * Establece una contraseña temporal para un usuario.
+     * 
+     * @param int    $id               ID del usuario
+     * @param string $passwordTemporal Contraseña temporal
+     * @return bool True si fue exitoso
+     */
+    public function establecerPasswordTemporal(int $id, string $passwordTemporal): bool;
+
+    /**
+     * Elimina lógicamente un usuario (activo=0).
+     * 
+     * @param int $id ID del usuario a eliminar
+     * @return bool True si fue exitoso
+     */
+    public function eliminarPorId(int $id): bool;
+
+    /**
+     * Verifica si un nombre de usuario ya existe.
+     * 
+     * @param string   $usuario   Nombre de usuario
+     * @param int|null $exceptoId ID a excluir (para edición)
+     * @return bool True si existe
+     */
+    public function existeUsuario(string $usuario, ?int $exceptoId = null): bool;
+}
+```
+
+---
+
+#### ModeloArbitro
+
+```php
+/**
+ * Modelo Árbitro
+ * 
+ * Gestiona las operaciones sobre la tabla arbitros y sus relaciones.
+ * Incluye estadísticas, disponibilidad y contactos.
+ * 
+ * @package    Modelos
+ * @extends    ModeloBase
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ModeloArbitro extends ModeloBase {
+    /**
+     * Lista todos los árbitros activos con nombre completo.
+     * 
+     * @return array Lista de árbitros ordenados por apellidos y nombre
+     */
+    public function listarTodos(): array;
+
+    /**
+     * Lista todos los árbitros con estadísticas de partidos.
+     * 
+     * Incluye conteo de partidos arbitrados y días disponibles.
+     * 
+     * @return array Lista de árbitros con estadísticas agregadas
+     */
+    public function listarConEstadisticas(): array;
+
+    /**
+     * Obtiene un árbitro por su ID.
+     * 
+     * @param int $id ID del árbitro
+     * @return array|null Datos del árbitro o null
+     */
+    public function obtenerPorId(int $id): ?array;
+
+    /**
+     * Obtiene un árbitro por el ID de usuario vinculado.
+     * 
+     * @param int $usuarioId ID del usuario
+     * @return array|null Datos del árbitro o null
+     */
+    public function obtenerPorUsuario(int $usuarioId): ?array;
+
+    /**
+     * Crea un árbitro asociado a un usuario existente.
+     * 
+     * @param int         $usuarioId      ID del usuario asociado
+     * @param string      $nombre         Nombre del árbitro
+     * @param string      $apellidos      Apellidos del árbitro
+     * @param string|null $ciudad         Ciudad (opcional)
+     * @param string|null $numeroLicencia Número de licencia (opcional)
+     * @param string|null $dni            DNI (opcional)
+     * @param string|null $telefono       Teléfono (opcional)
+     * @return int ID del árbitro creado
+     */
+    public function crearParaUsuario(
+        int $usuarioId, 
+        string $nombre, 
+        string $apellidos, 
+        ?string $ciudad = null, 
+        ?string $numeroLicencia = null,
+        ?string $dni = null,
+        ?string $telefono = null
+    ): int;
+
+    /**
+     * Actualiza los datos de un árbitro por usuario.
+     * 
+     * @param int         $usuarioId      ID del usuario asociado
+     * @param string      $nombre         Nombre
+     * @param string      $apellidos      Apellidos
+     * @param string|null $ciudad         Ciudad
+     * @param string|null $numeroLicencia Número de licencia
+     * @return bool True si se actualiza correctamente
+     */
+    public function actualizarParaUsuario(
+        int $usuarioId, 
+        string $nombre, 
+        string $apellidos, 
+        ?string $ciudad, 
+        ?string $numeroLicencia
+    ): bool;
+
+    /**
+     * Actualiza los datos completos de un árbitro por ID.
+     * 
+     * @param int   $id    ID del árbitro
+     * @param array $datos Datos a actualizar (nombre, apellidos, ciudad, etc.)
+     * @return bool True si se actualiza correctamente
+     */
+    public function actualizar(int $id, array $datos): bool;
+
+    /**
+     * Obtiene estadísticas generales de árbitros.
+     * 
+     * @return array Estadísticas globales
+     */
+    public function obtenerEstadisticas(): array;
+
+    /**
+     * Obtiene niveles de licencia disponibles.
+     * 
+     * @return array<string,string> Mapa código => descripción
+     */
+    public static function getNivelesLicencia(): array;
+}
+```
+
+---
+
+#### ModeloPartido
+
+```php
+/**
+ * ModeloPartido: CRUD de partidos.
+ * 
+ * Gestiona las operaciones sobre la tabla partidos,
+ * incluyendo asignaciones de árbitros y consultas.
+ * 
+ * @package    Modelos
+ * @extends    ModeloBase
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ModeloPartido extends ModeloBase {
+    /**
+     * Crea un nuevo partido.
+     * 
+     * @param array $datos Datos del partido:
+     *                     - equipo_local (string)
+     *                     - equipo_visitante (string)
+     *                     - categoria_id (int)
+     *                     - fecha (string: Y-m-d H:i:s)
+     *                     - pabellon_nombre (string)
+     *                     - arbitro_principal_id (int|null)
+     *                     - arbitro_segundo_id (int|null)
+     *                     - anotador_id (int|null)
+     * @return int ID del partido creado
+     */
+    public function crear(array $datos): int;
+
+    /**
+     * Actualiza un partido existente.
+     * 
+     * @param int   $id    ID del partido
+     * @param array $datos Datos a actualizar
+     * @return bool True si se actualizó correctamente
+     */
+    public function actualizar(int $id, array $datos): bool;
+
+    /**
+     * Elimina un partido por ID.
+     * 
+     * @param int $id ID del partido
+     * @return bool True si se eliminó correctamente
+     */
+    public function eliminar(int $id): bool;
+
+    /**
+     * Obtiene todos los partidos ordenados por fecha.
+     * 
+     * Incluye información de árbitros y categoría mediante JOINs.
+     * 
+     * @return array Lista de partidos con datos completos
+     */
+    public function obtenerTodos(): array;
+
+    /**
+     * Obtiene un partido específico por ID.
+     * 
+     * @param int $id ID del partido
+     * @return array|null Datos del partido o null
+     */
+    public function obtenerPorId(int $id): ?array;
+
+    /**
+     * Obtiene los partidos de un árbitro específico.
+     * 
+     * @param int $arbitroId ID del árbitro
+     * @param int $limite    Límite de resultados (0 = sin límite)
+     * @return array Lista de partidos del árbitro
+     */
+    public function obtenerPorArbitro(int $arbitroId, int $limite = 0): array;
+
+    /**
+     * Obtiene estadísticas de un árbitro.
+     * 
+     * @param int $arbitroId ID del árbitro
+     * @return array Estadísticas:
+     *               - total_partidos
+     *               - como_principal
+     *               - como_segundo
+     *               - como_anotador
+     */
+    public function obtenerEstadisticasArbitro(int $arbitroId): array;
+
+    /**
+     * Obtiene partidos en un rango de fechas para un árbitro.
+     * 
+     * @param int    $arbitroId   ID del árbitro
+     * @param string $fechaInicio Fecha inicio (Y-m-d)
+     * @param string $fechaFin    Fecha fin (Y-m-d)
+     * @return array Lista de partidos con rol del árbitro
+     */
+    public function obtenerPorArbitroPeriodo(int $arbitroId, string $fechaInicio, string $fechaFin): array;
+}
+```
+
+---
+
+#### ModeloCategoria
+
+```php
+/**
+ * ModeloCategoria: acceso a datos de la tabla categorias.
+ * 
+ * Gestiona las categorías de competición con sus tarifas por rol.
+ * 
+ * @package    Modelos
+ * @extends    ModeloBase
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ModeloCategoria extends ModeloBase {
+    /**
+     * Devuelve el listado completo de categorías.
+     * 
+     * @return array<int,array<string,mixed>> Lista ordenada por nombre
+     */
+    public function listarTodas(): array;
+
+    /**
+     * Obtiene una categoría por su ID.
+     * 
+     * @param int $id ID de la categoría
+     * @return array|false Datos o false si no existe
+     */
+    public function obtenerPorId(int $id);
+
+    /**
+     * Crea una nueva categoría.
+     * 
+     * @param array $datos Datos de la categoría:
+     *                     - nombre (string)
+     *                     - descripcion (string|null)
+     *                     - precio_arbitro1 (float)
+     *                     - precio_arbitro2 (float)
+     *                     - precio_anotador (float)
+     * @return int|false ID creado o false si falla
+     */
+    public function crear(array $datos);
+
+    /**
+     * Actualiza una categoría existente.
+     * 
+     * @param int   $id    ID de la categoría
+     * @param array $datos Datos a actualizar
+     * @return bool True si se actualizó correctamente
+     */
+    public function actualizar(int $id, array $datos): bool;
+
+    /**
+     * Elimina una categoría.
+     * 
+     * @param int $id ID de la categoría
+     * @return bool True si se eliminó correctamente
+     */
+    public function eliminar(int $id): bool;
+
+    /**
+     * Obtiene los precios de una categoría.
+     * 
+     * @param int $categoriaId ID de la categoría
+     * @return array Precios por rol
+     */
+    public function obtenerPrecios(int $categoriaId): array;
+}
+```
+
+---
+
+#### ModeloDisponibilidad
+
+```php
+/**
+ * ModeloDisponibilidad: gestiona disponibilidad de los árbitros.
+ * 
+ * @package    Modelos
+ * @extends    ModeloBase
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ModeloDisponibilidad extends ModeloBase {
+    /**
+     * Obtiene disponibilidad futura de un árbitro.
+     * 
+     * @param int $arbitroId ID del árbitro
+     * @return array Lista de disponibilidades desde hoy
+     */
+    public function obtenerPorArbitro(int $arbitroId): array;
+
+    /**
+     * Guarda o actualiza disponibilidad de un día.
+     * 
+     * Utiliza INSERT ... ON DUPLICATE KEY UPDATE.
+     * 
+     * @param int         $arbitroId   ID del árbitro
+     * @param string      $fecha       Fecha (Y-m-d)
+     * @param int         $manana      Disponible mañana (0|1)
+     * @param int         $tarde       Disponible tarde (0|1)
+     * @param string|null $observacion Observaciones opcionales
+     * @return bool True si se guardó correctamente
+     */
+    public function guardar(int $arbitroId, string $fecha, int $manana, int $tarde, ?string $observacion): bool;
+
+    /**
+     * Lista disponibilidad por fecha con datos del árbitro.
+     * 
+     * @param string $fecha Fecha (Y-m-d)
+     * @return array<int,array> Lista de disponibilidades
+     */
+    public function listarPorFecha(string $fecha): array;
+
+    /**
+     * Obtiene árbitros disponibles por fecha y turno.
+     * 
+     * @param string      $fecha Fecha (Y-m-d)
+     * @param string|null $turno 'manana', 'tarde' o null para ambos
+     * @return array Lista de árbitros disponibles
+     */
+    public function obtenerDisponiblesPorFecha(string $fecha, ?string $turno = null): array;
+}
+```
+
+---
+
+#### ModeloLicencia
+
+```php
+/**
+ * Modelo Licencia
+ * 
+ * Gestiona las operaciones CRUD sobre la tabla licencias_arbitros.
+ * Las licencias representan el historial de certificaciones de cada árbitro.
+ * 
+ * @package    Modelos
+ * @extends    ModeloBase
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ModeloLicencia extends ModeloBase {
+    /**
+     * Obtiene todas las licencias con información del árbitro.
+     * 
+     * @return array Lista ordenada por fecha de creación
+     */
+    public function obtenerTodas(): array;
+
+    /**
+     * Obtiene una licencia por su ID.
+     * 
+     * @param int $id ID de la licencia
+     * @return array|false Datos o false si no existe
+     */
+    public function obtenerPorId(int $id);
+
+    /**
+     * Obtiene todas las licencias de un árbitro.
+     * 
+     * @param int $arbitroId ID del árbitro
+     * @return array Lista de licencias ordenadas por fecha
+     */
+    public function obtenerPorArbitro(int $arbitroId): array;
+
+    /**
+     * Obtiene la licencia principal de un árbitro.
+     * 
+     * @param int $arbitroId ID del árbitro
+     * @return array|false Licencia de mayor nivel o false
+     */
+    public function obtenerLicenciaPrincipal(int $arbitroId);
+
+    /**
+     * Crea una nueva licencia y actualiza el nivel del árbitro.
+     * 
+     * @param array $datos Datos:
+     *                     - arbitro_id (int)
+     *                     - fecha_expedicion (string)
+     *                     - nivel_licencia (string)
+     * @return int ID de la licencia creada
+     * @throws PDOException Si ocurre error en transacción
+     */
+    public function crear(array $datos): int;
+
+    /**
+     * Actualiza una licencia existente.
+     * 
+     * @param int   $id    ID de la licencia
+     * @param array $datos Nuevos datos
+     * @return bool True si se actualizó
+     */
+    public function actualizar(int $id, array $datos): bool;
+
+    /**
+     * Elimina una licencia y actualiza el nivel del árbitro.
+     * 
+     * @param int $id ID de la licencia
+     * @return bool True si se eliminó
+     */
+    public function eliminar(int $id): bool;
+
+    /**
+     * Obtiene los niveles de licencia disponibles.
+     * 
+     * @return array<string,string> Mapa código => descripción
+     */
+    public static function getNivelesLicencia(): array;
+}
+```
+
+---
+
+#### ModeloLiquidacion
+
+```php
+/**
+ * Modelo Liquidación
+ * 
+ * Gestiona las operaciones CRUD sobre liquidaciones de árbitros.
+ * Incluye cálculo de importes, gestión de rectificaciones y detalle de partidos.
+ * 
+ * @package    Modelos
+ * @extends    ModeloBase
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ModeloLiquidacion extends ModeloBase {
+    /**
+     * Obtiene todas las liquidaciones con información agregada.
+     * 
+     * @return array Lista con totales calculados
+     */
+    public function obtenerTodas(): array;
+
+    /**
+     * Obtiene una liquidación por su ID.
+     * 
+     * @param int $id ID de la liquidación
+     * @return array|false Datos completos o false
+     */
+    public function obtenerPorId(int $id);
+
+    /**
+     * Obtiene las liquidaciones de un árbitro.
+     * 
+     * @param int $arbitroId ID del árbitro
+     * @return array Lista de liquidaciones con rectificaciones
+     */
+    public function obtenerPorArbitro(int $arbitroId): array;
+
+    /**
+     * Crea una nueva liquidación.
+     * 
+     * @param array $datos Datos:
+     *                     - arbitro_id (int)
+     *                     - fecha_inicio (string)
+     *                     - fecha_fin (string)
+     *                     - observaciones (string|null)
+     * @return int ID de la liquidación creada
+     */
+    public function crear(array $datos): int;
+
+    /**
+     * Actualiza una liquidación existente.
+     * 
+     * @param int   $id    ID de la liquidación
+     * @param array $datos Nuevos datos
+     * @return bool True si se actualizó
+     */
+    public function actualizar(int $id, array $datos): bool;
+
+    /**
+     * Elimina una liquidación.
+     * 
+     * @param int $id ID de la liquidación
+     * @return bool True si se eliminó
+     */
+    public function eliminar(int $id): bool;
+
+    /**
+     * Obtiene los partidos de una liquidación.
+     * 
+     * @param int $liquidacionId ID de la liquidación
+     * @return array Lista de partidos con importes
+     */
+    public function obtenerPartidosLiquidacion(int $liquidacionId): array;
+
+    /**
+     * Genera los partidos para una liquidación.
+     * 
+     * @param int $liquidacionId ID de la liquidación
+     * @return int Número de partidos cargados
+     */
+    public function generarPartidosLiquidacion(int $liquidacionId): int;
+
+    /**
+     * Obtiene tipos de liquidación disponibles.
+     * 
+     * @return array<string,string> Mapa tipo => descripción
+     */
+    public static function getTiposLiquidacion(): array;
+
+    /**
+     * Obtiene estados de liquidación disponibles.
+     * 
+     * @return array<string,string> Mapa estado => descripción
+     */
+    public static function getEstadosLiquidacion(): array;
+
+    /**
+     * Cuenta rectificaciones pendientes.
+     * 
+     * @return int Número de rectificaciones pendientes
+     */
+    public function contarRectificacionesPendientes(): int;
+}
+```
+
+---
+
+### 2.2 Controladores
+
+Los controladores se encuentran en `src/www/controladores/`.
+
+---
+
+#### ControladorAutenticacion
+
+```php
+/**
+ * ControladorAutenticacion: gestiona inicio, cierre de sesión y cambio de contraseña.
+ * 
+ * @package    Controladores
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ControladorAutenticacion {
+    /**
+     * Modelo para operaciones de usuario.
+     * @var ModeloUsuario
+     */
+    private ModeloUsuario $modeloUsuario;
+
+    /**
+     * Constructor - inicializa el modelo de usuario.
+     */
+    public function __construct();
+
+    /**
+     * Procesa intento de inicio de sesión.
+     * 
+     * - Valida credenciales
+     * - Establece variables de sesión
+     * - Redirige al dashboard o cambio de contraseña
+     * 
+     * @return void
+     */
+    public function iniciarSesion(): void;
+
+    /**
+     * Procesa el cambio de contraseña del usuario.
+     * 
+     * - Valida contraseña actual (si no es temporal)
+     * - Verifica requisitos de nueva contraseña
+     * - Actualiza en base de datos
+     * 
+     * @return void
+     */
+    public function cambiarPassword(): void;
+
+    /**
+     * Cierra la sesión actual.
+     * 
+     * Destruye sesión y cookies asociadas.
+     * 
+     * @return void
+     */
+    public function cerrarSesion(): void;
+
+    /**
+     * Verifica si hay una sesión iniciada.
+     * 
+     * @return bool True si el usuario está autenticado
+     */
+    public static function autenticado(): bool;
+}
+```
+
+---
+
+#### ControladorUsuario
+
+```php
+/**
+ * ControladorUsuario: gestión de altas, bajas y edición de usuarios.
+ * 
+ * Solo accesible por administradores.
+ * 
+ * @package    Controladores
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ControladorUsuario {
+    /**
+     * @var ModeloUsuario
+     */
+    private ModeloUsuario $modeloUsuario;
+
+    /**
+     * Constructor - verifica autenticación y rol de administrador.
+     */
+    public function __construct();
+
+    /**
+     * Muestra formulario de creación.
+     * @return void
+     */
+    public function formularioCrear(): void;
+
+    /**
+     * Devuelve datos del árbitro asociado (JSON).
+     * @return void
+     */
+    public function obtenerArbitro(): void;
+
+    /**
+     * Procesa la creación de un nuevo usuario.
+     * 
+     * - Crea usuario en tabla usuarios
+     * - Si es árbitro, crea registro en tabla arbitros
+     * 
+     * @return void
+     */
+    public function crear(): void;
+
+    /**
+     * Listado de usuarios activos.
+     * @return void
+     */
+    public function listado(): void;
+
+    /**
+     * Redirige al listado para edición vía modal.
+     * @return void
+     */
+    public function editar(): void;
+
+    /**
+     * Procesa la actualización de un usuario.
+     * @return void
+     */
+    public function actualizar(): void;
+
+    /**
+     * Procesa la eliminación lógica de un usuario.
+     * @return void
+     */
+    public function eliminar(): void;
+
+    /**
+     * Restablece la contraseña de un usuario.
+     * @return void
+     */
+    public function restablecerPassword(): void;
+}
+```
+
+---
+
+#### ControladorArbitro
+
+```php
+/**
+ * Controlador de Árbitros
+ * 
+ * Gestiona las operaciones sobre árbitros.
+ * Incluye funcionalidades para administradores y consultas de árbitros.
+ * 
+ * @package    Controladores
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ControladorArbitro {
+    /** @var ModeloArbitro */
+    private $modelo;
+    
+    /** @var ModeloPartido */
+    private $modeloPartido;
+
+    /**
+     * Constructor del controlador.
+     */
+    public function __construct();
+
+    /**
+     * Muestra el listado de árbitros con estadísticas.
+     * @return void
+     */
+    public function listado(): void;
+
+    /**
+     * Muestra la lista de compañeros árbitros.
+     * @return void
+     */
+    public function listaCompaneros(): void;
+
+    /**
+     * Consulta la disponibilidad de árbitros por fecha (AJAX).
+     * 
+     * @return void Respuesta JSON
+     */
+    public function consultarDisponibilidad(): void;
+
+    /**
+     * Muestra el detalle de un árbitro específico.
+     * @return void
+     */
+    public function detalle(): void;
+
+    /**
+     * Muestra el formulario de edición de un árbitro.
+     * @return void
+     */
+    public function editar(): void;
+
+    /**
+     * Procesa la actualización de un árbitro.
+     * @return void
+     */
+    public function actualizar(): void;
+}
+```
+
+---
+
+#### ControladorPartido
+
+```php
+/**
+ * ControladorPartido: orquestación de CRUD de partidos.
+ * 
+ * @package    Controladores
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ControladorPartido {
+    /** @var ModeloPartido */
+    private ModeloPartido $modeloPartido;
+
+    /**
+     * Constructor - verifica autenticación.
+     */
+    public function __construct();
+
+    /**
+     * Lista todos los partidos con datos de árbitros y categorías.
+     * @return void
+     */
+    public function listado(): void;
+
+    /**
+     * Redirige al listado (modal de creación).
+     * @return void
+     */
+    public function formularioCrear(): void;
+
+    /**
+     * Procesa creación de partido.
+     * @return void
+     */
+    public function crear(): void;
+
+    /**
+     * Redirige al listado (modal de edición).
+     * @return void
+     */
+    public function editar(): void;
+
+    /**
+     * Obtiene datos de un partido en JSON.
+     * @return void
+     */
+    public function obtenerPartido(): void;
+
+    /**
+     * Actualiza partido existente.
+     * @return void
+     */
+    public function actualizar(): void;
+
+    /**
+     * Elimina partido.
+     * @return void
+     */
+    public function eliminar(): void;
+}
+```
+
+---
+
+#### ControladorDisponibilidad
+
+```php
+/**
+ * ControladorDisponibilidad: gestión de disponibilidad del árbitro autenticado.
+ * 
+ * Solo accesible por usuarios con rol árbitro.
+ * 
+ * @package    Controladores
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ControladorDisponibilidad {
+    /** @var ModeloDisponibilidad */
+    private ModeloDisponibilidad $modeloDisponibilidad;
+    
+    /** @var ModeloUsuario */
+    private ModeloUsuario $modeloUsuario;
+    
+    /** @var ModeloArbitro */
+    private ModeloArbitro $modeloArbitro;
+
+    /**
+     * Constructor - verifica autenticación y rol de árbitro.
+     */
+    public function __construct();
+
+    /**
+     * Muestra la vista con disponibilidad del árbitro.
+     * @return void
+     */
+    public function ver(): void;
+
+    /**
+     * Procesa guardado de disponibilidad (POST).
+     * @return void
+     */
+    public function guardar(): void;
+}
+```
+
+---
+
+#### ControladorPerfil
+
+```php
+/**
+ * ControladorPerfil: gestiona la visualización y actualización del perfil.
+ * 
+ * @package    Controladores
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ControladorPerfil {
+    /** @var ModeloUsuario */
+    private ModeloUsuario $modeloUsuario;
+    
+    /** @var ModeloArbitro */
+    private ModeloArbitro $modeloArbitro;
+
+    /**
+     * Constructor - verifica autenticación.
+     */
+    public function __construct();
+
+    /**
+     * Muestra el perfil del usuario autenticado.
+     * @return void
+     */
+    public function ver(): void;
+
+    /**
+     * Procesa la actualización del perfil.
+     * 
+     * - Valida email, DNI y IBAN
+     * - Actualiza datos de usuario y árbitro
+     * 
+     * @return void
+     */
+    public function actualizar(): void;
+}
+```
+
+---
+
+#### ControladorLicencia
+
+```php
+/**
+ * Controlador de Licencias
+ * 
+ * Gestiona las operaciones CRUD sobre licencias de árbitros.
+ * Solo accesible por administradores.
+ * 
+ * @package    Controladores
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ControladorLicencia {
+    /** @var ModeloLicencia */
+    private $modelo;
+    
+    /** @var ModeloArbitro */
+    private $modeloArbitro;
+
+    /**
+     * Constructor del controlador.
+     */
+    public function __construct();
+
+    /**
+     * Muestra el listado de todas las licencias.
+     * @return void
+     */
+    public function listado(): void;
+
+    /**
+     * Muestra el formulario de creación.
+     * @return void
+     */
+    public function formularioCrear(): void;
+
+    /**
+     * Procesa la creación de una nueva licencia.
+     * @return void
+     */
+    public function crear(): void;
+
+    /**
+     * Muestra el formulario de edición.
+     * @return void
+     */
+    public function editar(): void;
+
+    /**
+     * Procesa la actualización de una licencia.
+     * @return void
+     */
+    public function actualizar(): void;
+
+    /**
+     * Elimina una licencia.
+     * @return void
+     */
+    public function eliminar(): void;
+}
+```
+
+---
+
+#### ControladorLiquidacion
+
+```php
+/**
+ * Controlador de Liquidaciones
+ * 
+ * Gestiona las operaciones sobre liquidaciones de árbitros.
+ * Incluye funcionalidades para administradores y árbitros.
+ * 
+ * @package    Controladores
+ * @author     Sprint-3
+ * @version    1.0
+ */
+class ControladorLiquidacion {
+    /** @var ModeloLiquidacion */
+    private $modelo;
+    
+    /** @var ModeloArbitro */
+    private $modeloArbitro;
+
+    /**
+     * Constructor del controlador.
+     */
+    public function __construct();
+
+    /**
+     * Muestra el listado de liquidaciones (administradores).
+     * @return void
+     */
+    public function listado(): void;
+
+    /**
+     * Muestra las liquidaciones del árbitro autenticado.
+     * @return void
+     */
+    public function misLiquidaciones(): void;
+
+    /**
+     * Muestra el formulario de creación.
+     * @return void
+     */
+    public function formularioCrear(): void;
+
+    /**
+     * Procesa la creación de una liquidación.
+     * @return void
+     */
+    public function crear(): void;
+
+    /**
+     * Muestra el detalle de una liquidación.
+     * @return void
+     */
+    public function detalle(): void;
+
+    /**
+     * Muestra el formulario de edición.
+     * @return void
+     */
+    public function editar(): void;
+
+    /**
+     * Procesa la actualización de una liquidación.
+     * @return void
+     */
+    public function actualizar(): void;
+
+    /**
+     * Elimina una liquidación.
+     * @return void
+     */
+    public function eliminar(): void;
+
+    /**
+     * Genera PDF de una liquidación.
+     * @return void
+     */
+    public function generarPDF(): void;
+
+    /**
+     * Procesa una rectificación de liquidación.
+     * @return void
+     */
+    public function rectificar(): void;
+
+    /**
+     * Responde a una rectificación (administrador).
+     * @return void
+     */
+    public function responderRectificacion(): void;
+}
+```
+
+---
+
+## 3. Documentación JavaScript (JSDoc)
+
+Los archivos JavaScript se encuentran en `src/www/js/`.
+
+---
+
+### 3.1 Módulo Principal (app.js)
+
+```javascript
+/**
+ * JavaScript central del proyecto - Intranet
+ * 
+ * Sistema de scripts para interactividad y responsive design.
+ * Incluye: sidebar colapsable, tablas responsive con modal, validaciones.
+ * 
+ * @module app
+ * @version 2.0
+ */
+
+/**
+ * Inicializa el sistema de sidebar responsive.
+ * Configura eventos de apertura/cierre y comportamiento en resize.
+ * 
+ * @function initSidebarResponsive
+ * @returns {void}
+ */
+function initSidebarResponsive();
+
+/**
+ * Alterna el estado del sidebar (abierto/cerrado).
+ * 
+ * @function toggleSidebar
+ * @returns {void}
+ */
+function toggleSidebar();
+
+/**
+ * Abre el sidebar.
+ * Añade clases CSS, activa overlay y previene scroll del body.
+ * 
+ * @function abrirSidebar
+ * @returns {void}
+ */
+function abrirSidebar();
+
+/**
+ * Cierra el sidebar.
+ * Remueve clases CSS, desactiva overlay y restaura scroll.
+ * 
+ * @function cerrarSidebar
+ * @returns {void}
+ */
+function cerrarSidebar();
+
+/**
+ * Inicializa las tablas responsive con modal de detalle.
+ * Agrega modal de detalle al DOM para visualizar filas en móvil.
+ * 
+ * @function initTablasResponsive
+ * @returns {void}
+ */
+function initTablasResponsive();
+```
+
+---
+
+### 3.2 Módulo de Usuarios (usuarios.js)
+
+```javascript
+/**
+ * Funciones para gestión de modales de usuarios.
+ * 
+ * @module usuarios
+ * @description Manejo de modales para crear, editar y eliminar usuarios
+ */
+
+/**
+ * Abre un modal por su ID.
+ * 
+ * @function abrirModal
+ * @param {string} id - ID del modal a abrir
+ * @returns {void}
+ */
+function abrirModal(id);
+
+/**
+ * Cierra un modal por su ID.
+ * 
+ * @function cerrarModal
+ * @param {string} id - ID del modal a cerrar
+ * @returns {void}
+ */
+function cerrarModal(id);
+
+/**
+ * Abre el modal de crear usuario y limpia el formulario.
+ * 
+ * @function abrirModalCrear
+ * @returns {void}
+ */
+function abrirModalCrear();
+
+/**
+ * Abre el modal de editar usuario con los datos proporcionados.
+ * 
+ * @function abrirModalEditar
+ * @param {number} id - ID del usuario
+ * @param {string} usuario - Nombre de usuario
+ * @param {string} email - Email del usuario
+ * @param {string} tipo - Tipo de usuario (administrador/arbitro)
+ * @returns {void}
+ */
+function abrirModalEditar(id, usuario, email, tipo);
+
+/**
+ * Carga los datos del árbitro asociado a un usuario vía AJAX.
+ * 
+ * @function cargarDatosArbitro
+ * @param {number} usuarioId - ID del usuario
+ * @returns {void}
+ */
+function cargarDatosArbitro(usuarioId);
+
+/**
+ * Muestra/oculta los campos de árbitro según el tipo seleccionado.
+ * 
+ * @function toggleCamposArbitro
+ * @param {string} prefijo - Prefijo del formulario (crear/editar)
+ * @returns {void}
+ */
+function toggleCamposArbitro(prefijo);
+
+/**
+ * Abre el modal de confirmación de eliminación.
+ * 
+ * @function confirmarEliminar
+ * @param {number} id - ID del usuario a eliminar
+ * @param {string} nombre - Nombre del usuario
+ * @returns {void}
+ */
+function confirmarEliminar(id, nombre);
+
+/**
+ * Inicializa los event listeners para los modales.
+ * 
+ * @function initModalesUsuarios
+ * @returns {void}
+ */
+function initModalesUsuarios();
+```
+
+---
+
+### 3.3 Módulo de Partidos (partidos.js)
+
+```javascript
+/**
+ * Funciones para gestión de modales de partidos.
+ * 
+ * @module partidos
+ * @description Manejo de modales para crear, editar y eliminar partidos
+ */
+
+/**
+ * Abre un modal por su ID.
+ * 
+ * @function abrirModal
+ * @param {string} id - ID del modal a abrir
+ * @returns {void}
+ */
+function abrirModal(id);
+
+/**
+ * Cierra un modal por su ID.
+ * 
+ * @function cerrarModal
+ * @param {string} id - ID del modal a cerrar
+ * @returns {void}
+ */
+function cerrarModal(id);
+
+/**
+ * Abre el modal de crear partido y limpia el formulario.
+ * 
+ * @function abrirModalCrear
+ * @returns {void}
+ */
+function abrirModalCrear();
+
+/**
+ * Abre el modal de editar partido y carga los datos vía AJAX.
+ * 
+ * @function abrirModalEditar
+ * @param {number} id - ID del partido a editar
+ * @returns {void}
+ */
+function abrirModalEditar(id);
+
+/**
+ * Abre el modal de confirmación de eliminación.
+ * 
+ * @function confirmarEliminar
+ * @param {number} id - ID del partido a eliminar
+ * @param {string} descripcion - Descripción del partido (equipos)
+ * @returns {void}
+ */
+function confirmarEliminar(id, descripcion);
+
+/**
+ * Inicializa los event listeners para los modales.
+ * 
+ * @function initModalesPartidos
+ * @returns {void}
+ */
+function initModalesPartidos();
+```
+
+---
+
+### 3.4 Módulo de Árbitros (arbitros.js)
+
+```javascript
+/**
+ * Árbitros - Funcionalidades para gestión de árbitros.
+ * 
+ * @module arbitros
+ * @version 1.0.0
+ */
+
+/**
+ * Consulta la disponibilidad de árbitros para una fecha y turno.
+ * Realiza petición AJAX y muestra resultados en tabla.
+ * 
+ * @function consultarDisponibilidad
+ * @returns {void}
+ */
+function consultarDisponibilidad();
+
+/**
+ * Limpia los resultados de la consulta de disponibilidad.
+ * Oculta resultados y limpia campos del formulario.
+ * 
+ * @function limpiarConsulta
+ * @returns {void}
+ */
+function limpiarConsulta();
+```
+
+---
+
+### 3.5 Módulo de Disponibilidad (disponibilidad.js)
+
+```javascript
+/**
+ * Disponibilidad - Funcionalidades para gestión de disponibilidad.
+ * 
+ * @module disponibilidad
+ * @version 1.0.0
+ */
+
+/**
+ * Abre el modal de disponibilidad.
+ * Añade clase 'activo' al modal.
+ * 
+ * @function abrirModalDisponibilidad
+ * @returns {void}
+ */
+function abrirModalDisponibilidad();
+
+/**
+ * Cierra el modal de disponibilidad.
+ * Remueve clase 'activo' del modal.
+ * 
+ * @function cerrarModalDisponibilidad
+ * @returns {void}
+ */
+function cerrarModalDisponibilidad();
+```
+
+---
+
+### 3.6 Módulo de Liquidaciones (liquidaciones.js)
+
+```javascript
+/**
+ * Liquidaciones - Funcionalidades para gestión de liquidaciones.
+ * 
+ * @module liquidaciones
+ * @version 1.0.0
+ */
+
+/**
+ * Busca partidos para una liquidación.
+ * Valida selección de árbitro y período, luego consulta vía AJAX.
+ * 
+ * @function buscarPartidos
+ * @returns {void}
+ */
+function buscarPartidos();
+```
+
+---
+
+### 3.7 Módulo de Licencias (licencias.js)
+
+```javascript
+/**
+ * Licencias - Funcionalidades para gestión de licencias.
+ * 
+ * @module licencias
+ * @version 1.0.0
+ */
+
+/**
+ * Abre el modal de edición con los datos de la licencia.
+ * 
+ * @function editarLicencia
+ * @param {Object} licencia - Objeto con los datos de la licencia
+ * @param {number} licencia.id - ID de la licencia
+ * @param {number} licencia.arbitro_id - ID del árbitro
+ * @param {string} licencia.nivel_licencia - Nivel de la licencia
+ * @param {string} licencia.fecha_expedicion - Fecha de expedición
+ * @returns {void}
+ */
+function editarLicencia(licencia);
+```
+
+---
+
+### 3.8 Módulo de Modales (modales.js)
+
+```javascript
+/**
+ * Modales - Funcionalidades comunes para modales.
+ * 
+ * @module modales
+ * @version 1.0.0
+ */
+
+/**
+ * Abre un modal añadiendo la clase 'activo'.
+ * 
+ * @function abrirModal
+ * @param {string} id - El ID del modal a abrir
+ * @returns {void}
+ */
+function abrirModal(id);
+
+/**
+ * Cierra un modal eliminando la clase 'activo'.
+ * 
+ * @function cerrarModal
+ * @param {string} id - El ID del modal a cerrar
+ * @returns {void}
+ */
+function cerrarModal(id);
+
+/**
+ * Abre el modal de rectificación con el ID de liquidación.
+ * 
+ * @function abrirRectificacion
+ * @param {number|string} liquidacionId - El ID de la liquidación a rectificar
+ * @returns {void}
+ */
+function abrirRectificacion(liquidacionId);
+
+/**
+ * Abre el modal de confirmación de eliminación.
+ * 
+ * @function confirmarEliminar
+ * @param {number|string} id - El ID del elemento a eliminar
+ * @returns {void}
+ */
+function confirmarEliminar(id);
+```
+
+---
+
+### 3.9 Módulo Cambiar Contraseña (cambiar_password.js)
+
+```javascript
+/**
+ * Cambiar Password - Funcionalidades para cambio de contraseña.
+ * 
+ * @module cambiar_password
+ * @version 1.0.0
+ */
+
+/**
+ * Alterna la visibilidad de un campo de contraseña.
+ * 
+ * @function togglePassword
+ * @param {string} inputId - El ID del input de contraseña
+ * @returns {void}
+ */
+function togglePassword(inputId);
+
+/**
+ * Verifica la fortaleza de la contraseña.
+ * Evalúa longitud, números y letras, actualizando indicador visual.
+ * 
+ * @function checkStrength
+ * @returns {void}
+ */
+function checkStrength();
+
+/**
+ * Actualiza el estado visual de un requisito.
+ * 
+ * @function updateRequirement
+ * @param {string} id - El ID del elemento de requisito
+ * @param {boolean} valid - Si el requisito se cumple
+ * @returns {void}
+ */
+function updateRequirement(id, valid);
+
+/**
+ * Verifica si las contraseñas coinciden.
+ * Muestra mensaje de coincidencia/no coincidencia.
+ * 
+ * @function checkMatch
+ * @returns {void}
+ */
+function checkMatch();
+```
+
+---
+
+### 3.10 Módulo WCAG AAA (wcag-aaa.js)
+
+```javascript
+/**
+ * JavaScript de Accesibilidad WCAG AA
+ * 
+ * Funcionalidades para cumplir con WCAG 2.1 Nivel AAA.
+ * Incluye panel de configuración de accesibilidad para usuarios.
+ * 
+ * @module wcag-aaa
+ * @version 1.0
+ * @see https://www.w3.org/WAI/WCAG21/quickref/?levels=aaa
+ */
+
+/**
+ * Gestor de Accesibilidad.
+ * Proporciona configuraciones personalizables para usuarios.
+ * 
+ * @namespace AccesibilidadManager
+ */
+const AccesibilidadManager = {
+    /**
+     * Configuración actual de accesibilidad.
+     * @type {Object}
+     * @property {boolean} textoGrande - Texto más grande
+     * @property {boolean} espaciadoTexto - Mayor espaciado
+     * @property {boolean} reducirMovimiento - Reducir animaciones
+     * @property {boolean} resaltarEnlaces - Resaltar enlaces
+     * @property {boolean} cursorGrande - Cursor grande
+     * @property {boolean} lecturaFacil - Modo lectura fácil
+     */
+    config: {},
+
+    /**
+     * Panel de accesibilidad DOM.
+     * @type {HTMLElement}
+     */
+    panel: null,
+
+    /**
+     * Inicializa el módulo de accesibilidad.
+     * @returns {void}
+     */
+    init: function(),
+
+    /**
+     * Carga la configuración guardada en localStorage.
+     * @returns {void}
+     */
+    cargarConfiguracion: function(),
+
+    /**
+     * Guarda la configuración en localStorage.
+     * @returns {void}
+     */
+    guardarConfiguracion: function(),
+
+    /**
+     * Crea el panel de accesibilidad flotante.
+     * @returns {void}
+     */
+    crearPanel: function(),
+
+    /**
+     * Aplica la configuración actual al DOM.
+     * @returns {void}
+     */
+    aplicarConfiguracion: function(),
+
+    /**
+     * Inicializa atajos de teclado para accesibilidad.
+     * @returns {void}
+     */
+    inicializarAtajosTeclado: function(),
+
+    /**
+     * Mejora la navegación por teclado.
+     * @returns {void}
+     */
+    mejorarNavegacionTeclado: function(),
+
+    /**
+     * Anuncia cambios de página a lectores de pantalla.
+     * @returns {void}
+     */
+    anunciarCambiosPagina: function(),
+
+    /**
+     * Abre/cierra el panel de accesibilidad.
+     * @returns {void}
+     */
+    togglePanel: function(),
+
+    /**
+     * Cierra el panel de accesibilidad.
+     * @returns {void}
+     */
+    cerrarPanel: function(),
+
+    /**
+     * Anuncia un mensaje a lectores de pantalla.
+     * @param {string} mensaje - Mensaje a anunciar
+     * @returns {void}
+     */
+    anunciar: function(mensaje)
+};
+```
+
+---
+
+### 3.11 Módulo Nielsen (nielsen.js)
+
+```javascript
+/**
+ * JavaScript de Usabilidad - Principios de Nielsen
+ * 
+ * Implementación de funcionalidades para mejorar la experiencia de usuario
+ * según los 10 principios heurísticos de usabilidad.
+ * 
+ * @module nielsen
+ * @version 1.0
+ * @see docs/Diseño/Usabilidad/Principios_Nielsen.md
+ */
+
+/**
+ * Sistema de notificaciones Toast.
+ * Proporciona feedback visual inmediato al usuario.
+ * 
+ * @namespace ToastManager
+ */
+const ToastManager = {
+    /**
+     * Contenedor de toasts.
+     * @type {HTMLElement}
+     */
+    container: null,
+
+    /**
+     * Inicializa el contenedor de toasts.
+     * @returns {void}
+     */
+    init: function(),
+
+    /**
+     * Muestra un toast.
+     * 
+     * @param {Object} options - Opciones del toast
+     * @param {string} [options.titulo=''] - Título del mensaje
+     * @param {string} [options.mensaje=''] - Contenido del mensaje
+     * @param {string} [options.tipo='info'] - Tipo: 'exito', 'error', 'advertencia', 'info'
+     * @param {number} [options.duracion=5000] - Duración en ms
+     * @param {Function} [options.onDeshacer=null] - Callback para deshacer
+     * @returns {HTMLElement} Elemento toast creado
+     */
+    mostrar: function(options),
+
+    /**
+     * Cierra un toast con animación.
+     * @param {HTMLElement} toast - Elemento toast a cerrar
+     * @returns {void}
+     */
+    cerrar: function(toast),
+
+    /**
+     * Muestra toast de éxito.
+     * @param {string} mensaje - Mensaje
+     * @param {string} [titulo='¡Éxito!'] - Título
+     * @returns {HTMLElement}
+     */
+    exito: function(mensaje, titulo),
+
+    /**
+     * Muestra toast de error.
+     * @param {string} mensaje - Mensaje
+     * @param {string} [titulo='Error'] - Título
+     * @returns {HTMLElement}
+     */
+    error: function(mensaje, titulo),
+
+    /**
+     * Muestra toast de advertencia.
+     * @param {string} mensaje - Mensaje
+     * @param {string} [titulo='Atención'] - Título
+     * @returns {HTMLElement}
+     */
+    advertencia: function(mensaje, titulo),
+
+    /**
+     * Muestra toast informativo.
+     * @param {string} mensaje - Mensaje
+     * @param {string} [titulo=''] - Título
+     * @returns {HTMLElement}
+     */
+    info: function(mensaje, titulo)
+};
+
+/**
+ * Gestor de estados de carga.
+ * Muestra indicadores visuales durante operaciones.
+ * 
+ * @namespace LoadingManager
+ */
+const LoadingManager = {
+    /**
+     * Overlay de carga.
+     * @type {HTMLElement}
+     */
+    overlay: null,
+
+    /**
+     * Crea el overlay de carga.
+     * @returns {HTMLElement}
+     */
+    crearOverlay: function(),
+
+    /**
+     * Muestra el overlay de carga.
+     * @param {string} [texto='Cargando...'] - Texto a mostrar
+     * @returns {void}
+     */
+    mostrar: function(texto),
+
+    /**
+     * Oculta el overlay de carga.
+     * @returns {void}
+     */
+    ocultar: function(),
+
+    /**
+     * Añade estado de carga a un botón.
+     * @param {HTMLElement} boton - Botón a modificar
+     * @returns {void}
+     */
+    botonCargando: function(boton),
+
+    /**
+     * Quita estado de carga de un botón.
+     * @param {HTMLElement} boton - Botón a modificar
+     * @returns {void}
+     */
+    botonListo: function(boton)
+};
+
+/**
+ * Sistema de confirmación mejorado.
+ * Permite confirmar acciones destructivas con opciones claras.
+ * 
+ * @namespace ConfirmManager
+ */
+const ConfirmManager = {
+    /**
+     * Modal de confirmación.
+     * @type {HTMLElement}
+     */
+    modal: null,
+
+    /**
+     * Crea el modal de confirmación.
+     * @returns {void}
+     */
+    crearModal: function(),
+
+    /**
+     * Muestra diálogo de confirmación.
+     * 
+     * @param {Object} options - Opciones
+     * @param {string} options.titulo - Título del diálogo
+     * @param {string} options.mensaje - Mensaje de confirmación
+     * @param {string} [options.tipo='warning'] - Tipo de confirmación
+     * @param {string} [options.botonConfirmar='Confirmar'] - Texto botón confirmar
+     * @param {string} [options.botonCancelar='Cancelar'] - Texto botón cancelar
+     * @returns {Promise<boolean>} Promesa con resultado
+     */
+    mostrar: function(options)
+};
+```
+
+---
+
+## 4. Convenciones de Documentación
+
+### 4.1 PHPDoc
+
+| Etiqueta | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `@package` | Paquete/módulo | `@package Modelos` |
+| `@author` | Autor | `@author Sprint-3` |
+| `@version` | Versión | `@version 1.0` |
+| `@param` | Parámetro | `@param int $id ID del usuario` |
+| `@return` | Retorno | `@return array|null` |
+| `@throws` | Excepciones | `@throws PDOException` |
+| `@var` | Tipo de variable | `@var ModeloUsuario` |
+| `@see` | Referencia | `@see ModeloBase` |
+| `@example` | Ejemplo de uso | `@example $modelo->obtener(1);` |
+
+### 4.2 JSDoc
+
+| Etiqueta | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `@module` | Módulo | `@module usuarios` |
+| `@namespace` | Espacio de nombres | `@namespace ToastManager` |
+| `@function` | Función | `@function abrirModal` |
+| `@param` | Parámetro | `@param {string} id` |
+| `@returns` | Retorno | `@returns {void}` |
+| `@type` | Tipo | `@type {HTMLElement}` |
+| `@property` | Propiedad | `@property {boolean} activo` |
+| `@see` | Referencia | `@see modales.js` |
+| `@version` | Versión | `@version 1.0.0` |
+
+---
+
+ Antonio Gat Fernández | agatf02@educarex.es

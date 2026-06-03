@@ -1,103 +1,130 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Antonio Gat Fernández",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#04397f",
+    "light": "#6a8cb8",
+    "dark": "#04397f"
   },
-  "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
-        "groups": [
+        "tab": "HOME",
+        "pages": [
+          "antonio-gat-fernandez",
           {
-            "group": "Getting started",
+            "group": "Documentos",
+            "icon": "folder",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "ips-elasticas-aws"
+            ]
+          },
+          "licencia"
+        ]
+      },
+      {
+        "tab": "PROYECTOS",
+        "dropdowns": [
+          {
+            "dropdown": "Intranet FedexVB",
+            "color": {
+              "light": "#3d6ebb",
+              "dark": "#3d6ebb"
+            },
+            "groups": [
+              {
+                "group": "Intranet FedexVB",
+                "pages": []
+              }
             ]
           },
           {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+            "dropdown": "IntraVB",
+            "icon": "computer-classic",
+            "groups": [
+              {
+                "group": "IntraVB",
+                "pages": [
+                  "informacion",
+                  {
+                    "group": "Análisis",
+                    "pages": [
+                      {
+                        "group": "Arquitectura Tecnológica",
+                        "pages": [
+                          "arquitectura"
+                        ]
+                      },
+                      {
+                        "group": "Historias de Usuario",
+                        "pages": [
+                          "historias-de-usuario"
+                        ]
+                      },
+                      {
+                        "group": "Product Backlog",
+                        "pages": [
+                          "backlog"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Diseño",
+                    "pages": [
+                      {
+                        "group": "Guia de Estilos",
+                        "pages": [
+                          "guia"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Manual de Instalación",
+                    "pages": [
+                      "manual"
+                    ]
+                  },
+                  {
+                    "group": "Manual de Programación",
+                    "pages": [
+                      "doc-apis",
+                      "doc-pruebas",
+                      "manual-1"
+                    ]
+                  },
+                  {
+                    "group": "Manual de Usuario",
+                    "pages": [
+                      "manual-2"
+                    ]
+                  }
+                ]
+              }
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
+        "tab": "Intranet FedexVB",
+        "icon": "whistle",
+        "href": "https://arbitros.fedexvoleibol.com/"
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    ]
   },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Contacto",
+        "href": "mailto:hola@antoniogatfdez.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Página Principal",
+      "href": "https://antoniogatfdez.com"
     }
   },
   "contextual": {
@@ -114,9 +141,39 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/antoniogatfdez",
+      "github": "https://github.com/antoniogatfdez",
+      "linkedin": "https://linkedin.com/antoniogatfdez",
+      "instagram": "https://www.instagram.com/antoniogatfdez/",
+      "website": "https://antoniogatfdez.com/"
     }
-  }
+  },
+  "fonts": {
+    "family": "Roboto"
+  },
+  "banner": {
+    "dismissible": false,
+    "content": " "
+  },
+  "errors": {
+    "404": {
+      "title": "Página No Encontrada",
+      "description": "La página que buscas no existe. Si crees que ha sido un error contacta conmigo: hola@antoniogatfdez.com"
+    }
+  },
+  "interaction": {
+    "drilldown": true
+  },
+  "metadata": {
+    "timestamp": true
+  },
+  "integrations": {
+    "gtm": {
+      "tagId": "GTM-55MD7QHX"
+    }
+  },
+  "seo": {
+    "indexing": "all"
+  },
+  "favicon": "/images/logo.ico"
 }
